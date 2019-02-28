@@ -248,14 +248,19 @@ def countSize(url): #return how many words in a text file
 def questionFour():
     myDict = createDictionaryBigram()
 
-    brownSet = createSetBigram('brown-test-after-replaced-unk')
+    brownUrl = 'brown-test-after-replaced-unk'
+    brownSet = createSetBigram(brownUrl)
     countTypesBrownNotInTraining = countTypesBigram(myDict, brownSet)
-    countTokenBrownNotInTrainning = countTokensBigram(myDict, 'brown-test-after-replaced-unk')
-    countBigramInBrown = countSizeBigram('brown-test-after-replaced-unk')
+    countTokenBrownNotInTrainning = countTokensBigram(myDict, brownUrl)
+    countBigramInBrown = countSizeBigram(brownUrl)
 
-    learnerSet = createSetBigram('learner-test-after-replaced-unk')
+    learnerUrl = 'learner-test-after-replaced-unk'
+    learnerSet = createSetBigram(learnerUrl)
     countTypesLearnerNotInTraining = countTypesBigram(myDict, learnerSet)
-    countTokenLearnerNotInTraining = countTokensBigram(myDict, 'brown-test-after-replaced-unk')
+    countTokenLearnerNotInTraining = countTokensBigram(myDict, learnerUrl)
+    countBigramInLearner = countSizeBigram(learnerUrl)
+
+    
 
 # helper function for question 4 #
 
