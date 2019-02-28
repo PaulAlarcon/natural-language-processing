@@ -1,3 +1,5 @@
+from __future__ import division
+
 def writeToFile(url, container):
     bt = open(url, 'w')
     for string in container:
@@ -5,12 +7,10 @@ def writeToFile(url, container):
     bt.close()
 
 # padding sentences #
-
 def padSentence():
     paddingSentence('brown-train')  # padding the brown-train file
     paddingSentence('learner-test')  # padding the learner-test file
     paddingSentence('brown-test')  # padding the brown-test file
-
 
 def paddingSentence(url):
     # constant to append and prepend
@@ -149,35 +149,70 @@ def questionOne():
 
 def questionTwo():
     count = 0
+
     openFile = open('brown-train-after-replaced-unk.txt', 'r')
     openRead = openFile.readlines()
+
     for currentLine in openRead:
         count = count + len(currentLine.split(' '))
+
     print('Question 2: ', count)
 
 
 def questionThree():
     myDict = createDictionaryUnigram()
+    sizeTraining = countSize('brown-train-after')
+    print('Size of training set ', sizeTraining)
 
     # ** BROWN-TEST ** #
     brownSet = createSet('brown-test-after') 
-    countTokenAppearsBrownTest = countTokens(myDict, 'brown-test-after')
-    countTypesAppearBrownTest = countTypes(myDict, brownSet)
+    countTokenBrownNotAppearsTrainning = countTokens(myDict, 'brown-test-after')
+    countTypesBrownNotAppearTraining = countTypes(myDict, brownSet)
     sizeBrownTest = countSize('brown-test-after')
+
+    print(countTokenBrownNotAppearsTrainning, 'token')
+    print(countTypesBrownNotAppearTraining, 'type')
+    print(sizeBrownTest, 'size')
+
+
+    # COUNT OF HOW MANY WORD NOT APPEAR / COUNT OF HOW MANY WORD IN TRAINING
+    # COUNT OF HOW MANY THOSE ^ / SIZE OF THE TEST
+    percentageTokenBrown = countTokenBrownNotAppearsTrainning/sizeTraining
+
+    print(percentageTokenBrown, 'percentage token brown')
+    percentageTokenBrown =  (percentageTokenBrown / sizeBrownTest) * 100
+
+    percentageTypesBrown =  (countTypesBrownNotAppearTraining/sizeTraining)
+    percentageTypesBrown =  (percentageTypesBrown / sizeBrownTest) * 100
 
     # ** LEARNER-TEST ** #
     learnerSet = createSet('learner-test-after')
-    countTypesAppearLearnerTest = countTypes(myDict, learnerSet) 
-    countTokenAppearsLearnerTest = countTokens(myDict, 'learner-test-after')
+    countTokenLearnerNotAppearsTraining = countTokens(myDict, 'learner-test-after')
+    countTypesLearnerNotAppearTraining = countTypes(myDict, learnerSet) 
     sizeLearnerTest = countSize('learner-test-after')
 
-    print(countTokenAppearsBrownTest, ' count token appears brown test')
-    print(countTypesAppearBrownTest, ' count types appears brown test')
+    percentageTokenLearner =  (countTokenLearnerNotAppearsTraining/sizeTraining)
+    percentageTokenLearner =  (percentageTokenLearner / sizeLearnerTest) * 100
+
+    percentageTypesLearner =  (countTypesLearnerNotAppearTraining/sizeTraining)
+    percentageTypesLearner =  (percentageTypesLearner / sizeLearnerTest) * 100
+
+    #PRINTING OUT
+
+    print(countTokenBrownNotAppearsTrainning, ' count token appears brown test')
+    print(countTypesBrownNotAppearTraining, ' count types appears brown test')
     print(sizeBrownTest, ' size of brown test')
 
-    print(countTypesAppearLearnerTest, ' count type appears learner test')
-    print(countTokenAppearsLearnerTest, ' count token appears learner test')
+    print('Percentage of tokens in Brown not appear in training ', percentageTokenBrown)
+    print('Percentage of types in Brown not appear in training ', percentageTypesBrown)
+
+    print(countTypesLearnerNotAppearTraining, ' count type appears learner test')
+    print(countTokenLearnerNotAppearsTraining, ' count token appears learner test')
     print(sizeLearnerTest, ' size of learner test')
+
+
+    print('Percentage of tokens in Learner not appear in training ', percentageTokenLearner)
+    print('Percentage of types in Learner not appear in training ', percentageTypesLearner)
 
 
 def createSet(url):
@@ -224,3 +259,66 @@ def countSize(url):
 
     openFile.close()
     return count
+
+def questionFour():
+    myDict = createDictionaryBigram()
+
+    brownSet = createSetBigram('brown-test-after-replaced-unk')
+    countTypesBrownNotInTraining = countTypesBigram(myDict, brownSet)
+    countTokenBrownNotInTrainning = countTokensBigram(myDict, 'brown-test-after-replaced-unk')
+    countBigramInBrown = countSizeBigram('brown-test-after-replaced-unk')
+
+    learnerSet = createSetBigram('learner-test-after-replaced-unk')
+    countTypesLearnerNotInTraining = countTypesBigram(myDict, learnerSet)
+    countTokenLearnerNotInTraining = countTokensBigram(myDict, 'brown-test-after-replaced-unk')
+    countBigramInLearner = countSizeBigram('learner-test-after-replaced-unk')
+    
+def createSetBigram(url):
+    thisSet = set()
+    openFile = open(url + '.txt', 'r')
+    openRead = openFile.readlines()
+
+    for currentLine in openRead:
+        split = currentLine.split(' ')
+        for index in range(len(split) - 1):
+            combinedString = split[index] + ',' + split[index+1]
+            if combinedString not in thisSet:
+                thisSet.add(combinedString)
+    
+    return thisSet
+
+def countTypesBigram(myDict, mySet):
+
+    count = 0
+    for item in mySet:
+        if item not in myDict:
+            count = count + 1
+
+    return count
+
+def countTokensBigram(myDict, url):
+    count = 0
+    openFile = open(url + '.txt', 'r')
+    openRead = openFile.readlines()
+    
+    for currentLine in openRead:
+        split = currentLine.split(' ')
+        for index in range(len(split) - 1):
+            combinedString = split[index] + ',' + split[index+1]
+            # countBigramInBrown = countBigramInBrown + 1
+            if combinedString not in myDict:
+                count = count + 1
+    return count
+
+def countSizeBigram(url):
+    count = 0
+
+    openFile = open(url + '.txt', 'r')
+    openRead = openFile.readlines()
+    for currentLine in openRead:
+        split = currentLine.split(' ')
+        for index in range(len(split) - 1):
+            count = count + 1
+
+    return count
+    
