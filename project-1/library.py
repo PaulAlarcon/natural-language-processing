@@ -201,7 +201,6 @@ def questionThree():
     print('Percentage of types in Learner not appear in training ', percentageTypesLearner)
 
 # helper function for question 3 #
-
 def createSet(url):
     thisSet = set() 
 
@@ -244,9 +243,11 @@ def countSize(url): #return how many words in a text file
 
     openFile.close()
     return count
+# end of helper function for question 3 #
 
 def questionFour():
     myDict = createDictionaryBigram()
+    countTraining = countSizeBigram('brown-train-after-replaced-unk')
 
     brownUrl = 'brown-test-after-replaced-unk'
     brownSet = createSetBigram(brownUrl)
@@ -260,10 +261,7 @@ def questionFour():
     countTokenLearnerNotInTraining = countTokensBigram(myDict, learnerUrl)
     countBigramInLearner = countSizeBigram(learnerUrl)
 
-    
-
 # helper function for question 4 #
-
 def createSetBigram(url):
     thisSet = set()
     openFile = open(url + '.txt', 'r')
@@ -312,4 +310,5 @@ def countSizeBigram(url):
             count = count + 1
 
     return count
-    
+# end of helper function for question 4 # 
+
