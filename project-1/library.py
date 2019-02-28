@@ -4,8 +4,7 @@ def writeToFile(url, container):
         bt.write(string)
     bt.close()
 
-# padding sentences
-
+# padding sentences #
 
 def padSentence():
     paddingSentence('brown-train')  # padding the brown-train file
@@ -28,9 +27,6 @@ def paddingSentence(url):
     for currentLine in openRead:
         currentLine = currentLine.lower()  # lowecase everything
         lastIndex = len(currentLine) - 1
-        # currentLine = currentLine[:lastIndex] + ' ' + \
-        #     append + ' ' + currentLine[lastIndex:]
-
         currentLine = currentLine[:lastIndex] + ' ' + \
             append + currentLine[lastIndex:]
         container.append(prepend + ' ' + currentLine)
@@ -38,7 +34,7 @@ def paddingSentence(url):
 
     writeToFile(url+'-after.txt', container)
 
-# create dictionary
+# create dictionary #
 
 
 def createDictionaryUnigram():
@@ -54,10 +50,7 @@ def createDictionaryUnigram():
             else:
                 d[oneString] = 1
 
-    f = open('dictionary-unigram-before-unk-dataset.txt', 'w')
-    f.write(str(d))
-    f.close
-
+    writeDictToFile('dictionary-unigram-before-unk-dataset', d)
     return d
 
 
@@ -77,24 +70,26 @@ def createDictionaryBigram():
             else:
                 d[combinedString] = 1
 
-    f = open('dictionary-bigram-before-unk-dataset.txt', 'w')
+    writeDictToFile('dictionary-bigram-before-unk-dataset', d)
+    return d
+
+def writeDictToFile(url, d):
+    f = open(url + '.txt', 'w')
     f.write(str(d))
     f.close
-
-    return d
 
 # replacing the word with <unk>
 
 
 def replaceOccuring():
     d = createDictionaryUnigram()  # my dictionary
-    print('--Replacing the word occured once in brown-train file with unk--')
+    print('--Replacing the word occured once in brown-train file with <unk>--')
     replaceOccuringOnce(d, 'brown-train-after')
 
-    print('--Replacing the word not appeared in brown-test file with unk--')
+    print('--Replacing the word not appeared in brown-test file with <unk>--')
     replaceNotOccuring(d, 'brown-test-after')
 
-    print('--Replacing the word not appeared in brown-test file with unk--')
+    print('--Replacing the word not appeared in brown-test file with <unk>--')
     replaceNotOccuring(d, 'learner-test-after')
 
 
@@ -135,9 +130,10 @@ def replaceNotOccuring(d, url):
     for currentLine in openRead:
         # print(currentLine)
         txt = ''
-        currentLine = currentLine.lower()  # lowecase everything
         for key in currentLine.split(' '):
-            if key not in d.keys():
+            if key == '<s>':
+                txt = key
+            elif key not in d.keys():
                 txt = txt + ' <unk>'
             else:
                 txt = txt + ' ' + key
@@ -153,13 +149,10 @@ def questionOne():
 
 def questionTwo():
     count = 0
-
     openFile = open('brown-train-after-replaced-unk.txt', 'r')
     openRead = openFile.readlines()
-
     for currentLine in openRead:
         count = count + len(currentLine.split(' '))
-
     print('Question 2: ', count)
 
 
