@@ -28,8 +28,11 @@ def paddingSentence(url):
     for currentLine in openRead:
         currentLine = currentLine.lower()  # lowecase everything
         lastIndex = len(currentLine) - 1
+        # currentLine = currentLine[:lastIndex] + ' ' + \
+        #     append + ' ' + currentLine[lastIndex:]
+
         currentLine = currentLine[:lastIndex] + ' ' + \
-            append + ' ' + currentLine[lastIndex:]
+            append + currentLine[lastIndex:]
         container.append(prepend + ' ' + currentLine)
     openFile.close()
 
@@ -107,9 +110,10 @@ def replaceOccuringOnce(d, url):
     for currentLine in openRead:
         # print(currentLine)
         txt = ''
-        currentLine = currentLine.lower()  # lowecase everything
         for oneString in currentLine.split(' '):
-            if d.get(oneString) == 1:
+            if oneString == '<s>':
+                txt = oneString
+            elif d.get(oneString) == 1:
                 txt = txt + ' <unk>'
             else:
                 txt = txt + ' ' + oneString
@@ -144,116 +148,35 @@ def replaceNotOccuring(d, url):
 
 
 def questionOne():
-    mySet = set()  # my set
-    # print(len(mySet))
-    openFile = open('brown-train-after-replaced-unk.txt', 'r')
-    openRead = openFile.readlines()
-
-    for currentLine in openRead:
-        for oneString in currentLine.split(' '):
-            if oneString not in mySet:
-                mySet.add(oneString)
-
-    print('Question 1:')
-    print(len(mySet))
-
+    mySet = createSet('brown-train-after-replaced-unk')  # my set
+    print('Question 1: ', len(mySet))
 
 def questionTwo():
-    count1 = 0
-    count2 = 0
+    count = 0
 
     openFile = open('brown-train-after-replaced-unk.txt', 'r')
     openRead = openFile.readlines()
 
     for currentLine in openRead:
-        for oneString in currentLine.split(' '):
-            # print(oneString)
-            count1 = count1 + 1
+        count = count + len(currentLine.split(' '))
 
-    d = dict()
-    openFile = open('brown-train.txt', 'r')
-    openRead = openFile.readlines()
-
-    for currentLine in openRead:
-        for oneString in currentLine.split(' '):
-            if oneString in d:
-                d[oneString] += 1
-            else:
-                d[oneString] = 1
-
-    for value in d.values():
-        count2 = count2 + value
-
-    print('Question 2:')
-    print(count1)
-    print(count2)
+    print('Question 2: ', count)
 
 
 def questionThree():
-    d = createDictionaryUnigram()
+    myDict = createDictionaryUnigram()
 
     # ** BROWN-TEST ** #
-    countTokenAppearsBrownTest = 0
-    countTypesAppearBrownTest = 0
-    sizeBrownTest = 0
-
-    # CREATING SET FOR TYPES (UNIQUE )
-    brownSet = set()  # my set
-    openFile = open('brown-test-after.txt', 'r')
-    openRead = openFile.readlines()
-
-    for currentLine in openRead:
-        for oneString in currentLine.split(' '):
-            if oneString not in brownSet:
-                brownSet.add(oneString)
-
-    openFile = open('brown-test-after' + '.txt', 'r')
-    openRead = openFile.readlines()
-    # word types (unique)
-    for currentLine in openRead:
-        sizeBrownTest = sizeBrownTest + \
-            len(currentLine.split(' '))
-        for key in currentLine.split(' '):
-            if key not in d.keys():
-                countTokenAppearsBrownTest = countTokenAppearsBrownTest + 1
-
-    for item in brownSet:
-        if item not in d:
-            countTypesAppearBrownTest = countTypesAppearBrownTest + 1
-
-    openFile.close()
+    brownSet = createSet('brown-test-after') 
+    countTokenAppearsBrownTest = countTokens(myDict, 'brown-test-after')
+    countTypesAppearBrownTest = countTypes(myDict, brownSet)
+    sizeBrownTest = countSize('brown-test-after')
 
     # ** LEARNER-TEST ** #
-    countTypesAppearLearnerTest = 0
-    countTokenAppearsLearnerTest = 0
-    sizeLearnerTest = 0
-
-    # CREATING SET FOR TYPES (UNIQUE )
-    learnerSet = set()  # my set
-    openFile = open('learner-test-after.txt', 'r')
-    openRead = openFile.readlines()
-
-    for currentLine in openRead:
-        for oneString in currentLine.split(' '):
-            if oneString not in learnerSet:
-                learnerSet.add(oneString)
-
-    openFile = open('learner-test-after' + '.txt', 'r')
-    openRead = openFile.readlines()
-
-    # word types (unique)
-    for currentLine in openRead:
-        sizeLearnerTest = sizeLearnerTest + \
-            len(currentLine.split(' '))
-        for key in currentLine.split(' '):
-            if key not in d.keys():
-                countTokenAppearsLearnerTest = countTokenAppearsLearnerTest + 1
-
-    for item in learnerSet:
-        if item not in d:
-            countTypesAppearLearnerTest = countTypesAppearLearnerTest + 1
-
-    openFile.close()
+    learnerSet = createSet('learner-test-after')
+    countTypesAppearLearnerTest = countTypes(myDict, learnerSet) 
+    countTokenAppearsLearnerTest = countTokens(myDict, 'learner-test-after')
+    sizeLearnerTest = countSize('learner-test-after')
 
     print(countTokenAppearsBrownTest, ' count token appears brown test')
     print(countTypesAppearBrownTest, ' count types appears brown test')
@@ -264,10 +187,10 @@ def questionThree():
     print(sizeLearnerTest, ' size of learner test')
 
 
-def createSet():
+def createSet(url):
      # CREATING SET FOR TYPES (UNIQUE )
     thisSet = set()  # my set
-    openFile = open('brown-test-after.txt', 'r')
+    openFile = open(url + '.txt', 'r')
     openRead = openFile.readlines()
 
     for currentLine in openRead:
@@ -276,3 +199,35 @@ def createSet():
                 thisSet.add(oneString)
 
     return thisSet
+
+def countTypes(myDict, mySet):
+    count = 0
+    for item in mySet:
+        if item not in myDict:
+            count = count + 1
+    
+    return count
+
+def countTokens(myDict, url):
+    count = 0
+    openFile = open(url + '.txt', 'r')
+    openRead = openFile.readlines()
+    # word types (unique)
+    for currentLine in openRead:
+        for key in currentLine.split(' '):
+            if key not in myDict.keys():
+                count = count + 1
+
+    openFile.close()
+    return count
+
+def countSize(url):
+    count = 0
+    openFile = open(url + '.txt', 'r')
+    openRead = openFile.readlines()
+    # word types (unique)
+    for currentLine in openRead:
+        count = count + len(currentLine.split(' '))
+
+    openFile.close()
+    return count

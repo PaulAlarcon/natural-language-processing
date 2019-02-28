@@ -7,7 +7,7 @@ import library
 # library.replaceOccuring()
 
 # library.questionOne()
-library.questionTwo()
+# library.questionTwo()
 library.questionThree()
 
 # library.createDictionaryBigram()
