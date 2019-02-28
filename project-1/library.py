@@ -1,3 +1,4 @@
+#import this so when I divide number it would return float, for python 2.7
 from __future__ import division
 
 def writeToFile(url, container):
@@ -6,7 +7,7 @@ def writeToFile(url, container):
         bt.write(string)
     bt.close()
 
-# padding sentences #
+#-- padding sentences --#
 def padSentence():
     paddingSentence('brown-train')  # padding the brown-train file
     paddingSentence('learner-test')  # padding the learner-test file
@@ -25,7 +26,7 @@ def paddingSentence(url):
     openRead = openFile.readlines()
 
     for currentLine in openRead:
-        currentLine = currentLine.lower()  # lowecase everything
+        currentLine = currentLine.lower()  # lowercase everything
         lastIndex = len(currentLine) - 1
         currentLine = currentLine[:lastIndex] + ' ' + \
             append + currentLine[lastIndex:]
@@ -34,9 +35,7 @@ def paddingSentence(url):
 
     writeToFile(url+'-after.txt', container)
 
-# create dictionary #
-
-
+#-- create dictionary --#
 def createDictionaryUnigram():
     d = dict()  # my dictionary
 
@@ -52,7 +51,6 @@ def createDictionaryUnigram():
 
     writeDictToFile('dictionary-unigram-before-unk-dataset', d)
     return d
-
 
 def createDictionaryBigram():
     d = dict()  # my dictionary
@@ -79,8 +77,6 @@ def writeDictToFile(url, d):
     f.close
 
 # replacing the word with <unk>
-
-
 def replaceOccuring():
     d = createDictionaryUnigram()  # my dictionary
     print('--Replacing the word occured once in brown-train file with <unk>--')
@@ -92,23 +88,19 @@ def replaceOccuring():
     print('--Replacing the word not appeared in brown-test file with <unk>--')
     replaceNotOccuring(d, 'learner-test-after')
 
-
 def replaceOccuringOnce(d, url):
-    # REPLACE ALL WORD OCCURING IN TRAINING DATA ONCE WITH THE TOKEN UNK
-    # Reading from the file
+    # replace all data occurred in the training data once with <unk>
     openFile = open(url + '.txt', 'r')
     openRead = openFile.readlines()
 
     container = []
 
-    # REPLACE THE WORD WITH UNKNOWN
     for currentLine in openRead:
-        # print(currentLine)
         txt = ''
         for oneString in currentLine.split(' '):
             if oneString == '<s>':
                 txt = oneString
-            elif d.get(oneString) == 1:
+            elif d.get(oneString) == 1: # replace the word that appear only once with the word <unk>
                 txt = txt + ' <unk>'
             else:
                 txt = txt + ' ' + oneString
@@ -117,23 +109,19 @@ def replaceOccuringOnce(d, url):
 
     writeToFile(url+'-replaced-unk.txt', container)
 
-
 def replaceNotOccuring(d, url):
-    # REPLACE ALL WORD OCCURING IN TRAINING DATA ONCE WITH THE TOKEN UNK
-    # Reading from the file
+    # replace all data not occurred in the training data with <unk>
     openFile = open(url + '.txt', 'r')
     openRead = openFile.readlines()
 
     container = []
 
-    # REPLACE THE WORD WITH UNKNOWN
     for currentLine in openRead:
-        # print(currentLine)
         txt = ''
         for key in currentLine.split(' '):
             if key == '<s>':
                 txt = key
-            elif key not in d.keys():
+            elif key not in d.keys(): # replace the word that not appear in the training with <unk>
                 txt = txt + ' <unk>'
             else:
                 txt = txt + ' ' + key
@@ -141,7 +129,6 @@ def replaceNotOccuring(d, url):
     openFile.close()
 
     writeToFile(url + '-replaced-unk.txt', container)
-
 
 def questionOne():
     mySet = createSet('brown-train-after-replaced-unk')  # my set
@@ -157,7 +144,6 @@ def questionTwo():
         count = count + len(currentLine.split(' '))
 
     print('Question 2: ', count)
-
 
 def questionThree():
     myDict = createDictionaryUnigram()
@@ -214,10 +200,11 @@ def questionThree():
     print('Percentage of tokens in Learner not appear in training ', percentageTokenLearner)
     print('Percentage of types in Learner not appear in training ', percentageTypesLearner)
 
+# helper function for question 3 #
 
 def createSet(url):
-     # CREATING SET FOR TYPES (UNIQUE )
-    thisSet = set()  # my set
+    thisSet = set() 
+
     openFile = open(url + '.txt', 'r')
     openRead = openFile.readlines()
 
@@ -228,7 +215,7 @@ def createSet(url):
 
     return thisSet
 
-def countTypes(myDict, mySet):
+def countTypes(myDict, mySet): #return how many unique value in set, not appear in the map/dictionary
     count = 0
     for item in mySet:
         if item not in myDict:
@@ -236,11 +223,10 @@ def countTypes(myDict, mySet):
     
     return count
 
-def countTokens(myDict, url):
+def countTokens(myDict, url): #return how many tokens (all words) in the file not appear in the dict
     count = 0
     openFile = open(url + '.txt', 'r')
     openRead = openFile.readlines()
-    # word types (unique)
     for currentLine in openRead:
         for key in currentLine.split(' '):
             if key not in myDict.keys():
@@ -249,11 +235,10 @@ def countTokens(myDict, url):
     openFile.close()
     return count
 
-def countSize(url):
+def countSize(url): #return how many words in a text file
     count = 0
     openFile = open(url + '.txt', 'r')
     openRead = openFile.readlines()
-    # word types (unique)
     for currentLine in openRead:
         count = count + len(currentLine.split(' '))
 
@@ -271,8 +256,9 @@ def questionFour():
     learnerSet = createSetBigram('learner-test-after-replaced-unk')
     countTypesLearnerNotInTraining = countTypesBigram(myDict, learnerSet)
     countTokenLearnerNotInTraining = countTokensBigram(myDict, 'brown-test-after-replaced-unk')
-    countBigramInLearner = countSizeBigram('learner-test-after-replaced-unk')
-    
+
+# helper function for question 4 #
+
 def createSetBigram(url):
     thisSet = set()
     openFile = open(url + '.txt', 'r')
