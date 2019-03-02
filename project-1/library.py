@@ -33,7 +33,7 @@ def paddingSentence(url):
         currentLine = currentLine.lower()  # lowercase everything
         lastIndex = len(currentLine) - 1
         currentLine = currentLine[:lastIndex] + ' ' + \
-            append + currentLine[lastIndex:]
+            append + ' ' + currentLine[lastIndex:]
         container.append(prepend + ' ' + currentLine)
     openFile.close()
 
@@ -155,12 +155,18 @@ def questionTwo():
     openRead = openFile.readlines()
 
     for currentLine in openRead:
-        count = count + len(currentLine.split(' '))
+        splittedSentence = currentLine.split(' ')
+        for word in splittedSentence:
+            if word != '\n':
+                count = count + 1
+
+    openFile.close()
 
     print('Question 2: ', count)
 
 
 def questionThree():
+    print('Question 3:')
     myDict = createDictionaryUnigram()
     percentageQ3(myDict, 'brown-test-after')
     percentageQ3(myDict, 'learner-test-after')
@@ -175,13 +181,13 @@ def percentageQ3(myDict, url):
     countTypesNotAppearsTraining = countTypes(myDict, mySet)
     sizeTokens = countSize(url)  # size of token
 
-    # print('Size of types in ' + url + '=', sizeTypes)
-    # print('Size of tokens in ' + url + '=', sizeTokens)
+    print('Size of types in ' + url + '=', sizeTypes)
+    print('Size of tokens in ' + url + '=', sizeTokens)
 
-    # print('How many tokens in ' + url + ' not appear in training = ',
-    #       countTokenNotAppearsTrainning)
-    # print('How many types in ' + url + ' not appear in training = ',
-    #       countTypesNotAppearsTraining)
+    print('How many tokens in ' + url + ' not appear in training = ',
+          countTokenNotAppearsTrainning)
+    print('How many types in ' + url + ' not appear in training = ',
+          countTypesNotAppearsTraining)
 
     # COUNT OF HOW MANY WORD NOT APPEAR IN TRAINING / SIZE OF THE TEST
     percentageToken = countTokenNotAppearsTrainning/sizeTokens
@@ -234,7 +240,10 @@ def countSize(url):  # return how many words in a text file
     openFile = open(url + '.txt', 'r')
     openRead = openFile.readlines()
     for currentLine in openRead:
-        count = count + len(currentLine.split(' '))
+        splittedSentence = currentLine.split(' ')
+        for word in splittedSentence:
+            if word != '\n':
+                count = count + 1
 
     openFile.close()
     return count
@@ -242,6 +251,7 @@ def countSize(url):  # return how many words in a text file
 
 
 def questionFour():
+    print('Question 4:')
     myDict = createDictionaryBigram()
     # countTraining = countSizeBigram('brown-train-after-replaced-unk')
 
@@ -257,8 +267,14 @@ def percentageQ4(myDict, url):
     countTypesNotInTraining = countTypesBigram(myDict, mySet)
     countTokenNotInTraining = countTokensBigram(myDict, url)
     sizeTokens = countSizeBigram(url)
-    # print('Tokens = ', sizeTokens)
-    # print('Tokens not in training = ', countTokenNotInTraining)
+
+    print('Size of types in ' + url + '=', sizeTypes)
+    print('Size of tokens in ' + url + '=', sizeTokens)
+
+    print('How many tokens in ' + url + ' not appear in training = ',
+          countTokenNotInTraining)
+    print('How many types in ' + url + ' not appear in training = ',
+          countTypesNotInTraining)
 
     percentageToken = countTokenNotInTraining/sizeTokens
     print('How many percentage token in ' + url + ' = ', percentageToken)
@@ -297,13 +313,21 @@ def countTokensBigram(myDict, url):
     openFile = open(url + '.txt', 'r')
     openRead = openFile.readlines()
 
+    unigramDict = createDictionaryUnigram()
+
     for currentLine in openRead:
         split = currentLine.split(' ')
         for index in range(len(split) - 1):
-            combinedString = split[index] + ',' + split[index+1]
-            # countBigramInBrown = countBigramInBrown + 1
-            if combinedString not in myDict:
-                count = count + 1
+            if split[index] == '<unk>':
+                if split[index+1] not in unigramDict:
+                    count = count + 1
+            elif split[index+1] == '<unk>':
+                if split[index] not in unigramDict:
+                    count = count + 1
+            else:
+                combinedString = split[index] + ',' + split[index+1]
+                if combinedString not in myDict:
+                    count = count + 1
     return count
 
 
@@ -314,8 +338,28 @@ def countSizeBigram(url):
     openRead = openFile.readlines()
     for currentLine in openRead:
         split = currentLine.split(' ')
+        # count = count + len(split)
         for index in range(len(split) - 1):
             count = count + 1
 
     return count
 # end of helper function for question 4 #
+
+
+def questionFive():
+    aSentence = '<s> he was laughed off the screen . </s>'
+    bSentence = '<s> there was no compulsion behind them . </s>'
+    cSentence = '<s> i look forward to hearing your reply . </s>'
+
+    aSentenceSplit = aSentence.split(' ')
+    print(aSentenceSplit)
+
+    sizeOfToken = countSize('brown-train-after')
+
+    # UNIGRAM
+    myDict = createDictionaryUnigram()
+    for string in aSentenceSplit:
+        print(string)
+        if string in myDict:
+            print(string, myDict[string])
+    print(sizeOfToken)
