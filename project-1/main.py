@@ -11,11 +11,11 @@ import library
 # print('--End replacing occuring in test file--')
 
 
-print('\n--**--**--**--\n')
+# print('\n--**--**--**--\n')
 
-print('Answering questions: ')
+# print('Answering questions: ')
 # library.questionOne()
 # library.questionTwo()
-library.questionThree()
+# library.questionThree()
 # library.questionFour()
-# library.questionFive()
+library.questionFive()

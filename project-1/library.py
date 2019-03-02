@@ -253,7 +253,6 @@ def countSize(url):  # return how many words in a text file
 def questionFour():
     print('Question 4:')
     myDict = createDictionaryBigram()
-    # countTraining = countSizeBigram('brown-train-after-replaced-unk')
 
     percentageQ4(myDict, 'brown-test-after-replaced-unk')
     percentageQ4(myDict, 'learner-test-after-replaced-unk')
@@ -299,7 +298,6 @@ def createSetBigram(url):
 
 
 def countTypesBigram(myDict, mySet):
-
     count = 0
     for item in mySet:
         if item not in myDict:
@@ -339,7 +337,9 @@ def countSizeBigram(url):
     for currentLine in openRead:
         split = currentLine.split(' ')
         # count = count + len(split)
-        for index in range(len(split) - 1):
+        for index in range(len(split)):
+            if split[index] == '\n' or split[index + 1] == '\n':
+                continue
             count = count + 1
 
     return count
@@ -347,19 +347,43 @@ def countSizeBigram(url):
 
 
 def questionFive():
-    aSentence = '<s> he was laughed off the screen . </s>'
-    bSentence = '<s> there was no compulsion behind them . </s>'
-    cSentence = '<s> i look forward to hearing your reply . </s>'
-
-    aSentenceSplit = aSentence.split(' ')
-    print(aSentenceSplit)
-
+    myDict = createDictionaryUnigram()
     sizeOfToken = countSize('brown-train-after')
 
-    # UNIGRAM
-    myDict = createDictionaryUnigram()
-    for string in aSentenceSplit:
-        print(string)
+    probabilitySentenceUnigram(
+        'He was laughed off the screen .', myDict, sizeOfToken)
+    probabilitySentenceUnigram(
+        'There was no compulsion behind them .', myDict, sizeOfToken)
+    probabilitySentenceUnigram(
+        'I look forward to hearing your reply .', myDict, sizeOfToken)
+
+
+def modifiedSentence(string, myDict):
+    str = '<s> ' + string.lower() + ' </s>'
+    returnedStr = ''
+    for item in str.split(' '):
+        if item not in myDict:
+            returnedStr = returnedStr + ' <unk> '
+        else:
+            returnedStr = returnedStr + item
+    return str
+
+
+def probabilitySentenceUnigram(string, myDict, size):
+    sentence = modifiedSentence(string, myDict)
+    sentenceSplitted = sentence.split(' ')
+    # print(sentenceSplitted)
+    sum = 0
+
+    for string in sentenceSplitted:
+        if string == '<s>':
+            continue
+        # print(string)
         if string in myDict:
-            print(string, myDict[string])
-    print(sizeOfToken)
+            # print(string, myDict[string])
+            sum += myDict[string]/size
+    print('Probability unigram for ' + sentence, sum)
+
+
+def probabilitySentenceBigram(string, myDict, size):
+    print('execute order 66')
