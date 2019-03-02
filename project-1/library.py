@@ -162,26 +162,26 @@ def questionTwo():
 
 def questionThree():
     myDict = createDictionaryUnigram()
-    percentage(myDict, 'brown-test-after')
-    percentage(myDict, 'learner-test-after')
+    percentageQ3(myDict, 'brown-test-after')
+    percentageQ3(myDict, 'learner-test-after')
 
 # helper function for question 3 #
 
 
-def percentage(myDict, url):
+def percentageQ3(myDict, url):
     mySet = createSet(url)
     sizeTypes = len(mySet)  # size of set (unique types)
     countTokenNotAppearsTrainning = countTokens(myDict, url)
     countTypesNotAppearsTraining = countTypes(myDict, mySet)
     sizeTokens = countSize(url)  # size of token
 
-    print('Size of types in ' + url + '=', sizeTypes)
-    print('Size of tokens in ' + url + '=', sizeTokens)
+    # print('Size of types in ' + url + '=', sizeTypes)
+    # print('Size of tokens in ' + url + '=', sizeTokens)
 
-    print('How many tokens in ' + url + ' not appear in training = ',
-          countTokenNotAppearsTrainning)
-    print('How many types in ' + url + ' not appear in training = ',
-          countTypesNotAppearsTraining)
+    # print('How many tokens in ' + url + ' not appear in training = ',
+    #       countTokenNotAppearsTrainning)
+    # print('How many types in ' + url + ' not appear in training = ',
+    #       countTypesNotAppearsTraining)
 
     # COUNT OF HOW MANY WORD NOT APPEAR IN TRAINING / SIZE OF THE TEST
     percentageToken = countTokenNotAppearsTrainning/sizeTokens
@@ -243,21 +243,28 @@ def countSize(url):  # return how many words in a text file
 
 def questionFour():
     myDict = createDictionaryBigram()
-    countTraining = countSizeBigram('brown-train-after-replaced-unk')
+    # countTraining = countSizeBigram('brown-train-after-replaced-unk')
 
-    brownUrl = 'brown-test-after-replaced-unk'
-    brownSet = createSetBigram(brownUrl)
-    countTypesBrownNotInTraining = countTypesBigram(myDict, brownSet)
-    countTokenBrownNotInTrainning = countTokensBigram(myDict, brownUrl)
-    countBigramInBrown = countSizeBigram(brownUrl)
-
-    learnerUrl = 'learner-test-after-replaced-unk'
-    learnerSet = createSetBigram(learnerUrl)
-    countTypesLearnerNotInTraining = countTypesBigram(myDict, learnerSet)
-    countTokenLearnerNotInTraining = countTokensBigram(myDict, learnerUrl)
-    countBigramInLearner = countSizeBigram(learnerUrl)
+    percentageQ4(myDict, 'brown-test-after-replaced-unk')
+    percentageQ4(myDict, 'learner-test-after-replaced-unk')
 
 # helper function for question 4 #
+
+
+def percentageQ4(myDict, url):
+    mySet = createSetBigram(url)
+    sizeTypes = len(mySet)
+    countTypesNotInTraining = countTypesBigram(myDict, mySet)
+    countTokenNotInTraining = countTokensBigram(myDict, url)
+    sizeTokens = countSizeBigram(url)
+    # print('Tokens = ', sizeTokens)
+    # print('Tokens not in training = ', countTokenNotInTraining)
+
+    percentageToken = countTokenNotInTraining/sizeTokens
+    print('How many percentage token in ' + url + ' = ', percentageToken)
+
+    percentageTypes = (countTypesNotInTraining/sizeTypes)
+    print('How many percentage types in ' + url + ' = ', percentageTypes)
 
 
 def createSetBigram(url):

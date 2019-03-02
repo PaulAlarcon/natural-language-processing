@@ -16,5 +16,5 @@ import library
 # print('Answering questions: ')
 # library.questionOne()
 # library.questionTwo()
-library.questionThree()
-# library.questionFour()
+# library.questionThree()
+library.questionFour()
