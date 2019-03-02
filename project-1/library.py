@@ -1,5 +1,6 @@
 # import this so when I divide number it would return float, for python 2.7
 from __future__ import division
+from math import log
 
 
 def writeToFile(url, container):
@@ -76,6 +77,16 @@ def createDictionaryBigram():
                 d[combinedString] = 1
 
     writeDictToFile('dictionary-bigram-before-unk-dataset', d)
+    return d
+
+
+def createDictionaryBigramSmoothing():
+    d = createDictionaryBigram()
+
+    for key in d:
+        d[key] = d[key] + 1
+
+    writeDictToFile('dictionary-bigram-smoothing-before-unk-dataset', d)
     return d
 
 
@@ -347,15 +358,31 @@ def countSizeBigram(url):
 
 
 def questionFive():
-    myDict = createDictionaryUnigram()
+    dictUnigram = createDictionaryUnigram()
     sizeOfToken = countSize('brown-train-after')
 
-    probabilitySentenceUnigram(
-        'He was laughed off the screen .', myDict, sizeOfToken)
-    probabilitySentenceUnigram(
-        'There was no compulsion behind them .', myDict, sizeOfToken)
-    probabilitySentenceUnigram(
-        'I look forward to hearing your reply .', myDict, sizeOfToken)
+    fSentence = 'He was laughed off the screen .'
+    sSentence = 'There was no compulsion behind them .'
+    tSentence = 'I look forward to hearing your reply .'
+
+    probabilitySentenceUnigram(fSentence, dictUnigram, sizeOfToken)
+    probabilitySentenceUnigram(sSentence, dictUnigram, sizeOfToken)
+    probabilitySentenceUnigram(tSentence, dictUnigram, sizeOfToken)
+
+    dictBigram = createDictionaryBigram()
+
+    probabilitySentenceBigram(fSentence, dictBigram, sizeOfToken)
+    probabilitySentenceBigram(sSentence, dictBigram, sizeOfToken)
+    probabilitySentenceBigram(tSentence, dictBigram, sizeOfToken)
+
+    dictBigramSmoothing = createDictionaryBigramSmoothing()
+
+    probabilitySentenceBigramSmoothing(
+        fSentence, dictBigramSmoothing, sizeOfToken)
+    probabilitySentenceBigramSmoothing(
+        sSentence, dictBigramSmoothing, sizeOfToken)
+    probabilitySentenceBigramSmoothing(
+        tSentence, dictBigramSmoothing, sizeOfToken)
 
 
 def modifiedSentence(string, myDict):
@@ -381,9 +408,42 @@ def probabilitySentenceUnigram(string, myDict, size):
         # print(string)
         if string in myDict:
             # print(string, myDict[string])
-            sum += myDict[string]/size
+            sum += log(myDict[string]/size, 2)
+    sum = sum / len(sentenceSplitted)
     print('Probability unigram for ' + sentence, sum)
 
 
 def probabilitySentenceBigram(string, myDict, size):
-    print('execute order 66')
+    sentence = modifiedSentence(string, myDict)
+    sentenceSplitted = sentence.split(' ')
+
+    sum = 0
+    for index in range(len(sentenceSplitted) - 1):
+        combinedString = sentenceSplitted[index] + \
+            ',' + sentenceSplitted[index+1]
+        # print(combinedString)
+        if combinedString in myDict:
+            # print(combinedString, myDict[combinedString])
+            sum += log(myDict[combinedString]/size, 2)
+
+    sum = sum / len(sentenceSplitted)
+    print('Probability bigram for ' + sentence, sum)
+    return sum
+
+
+def probabilitySentenceBigramSmoothing(string, myDict, size):
+    sentence = modifiedSentence(string, myDict)
+    sentenceSplitted = sentence.split(' ')
+
+    sum = 0
+    for index in range(len(sentenceSplitted) - 1):
+        combinedString = sentenceSplitted[index] + \
+            ',' + sentenceSplitted[index+1]
+        # print(combinedString)
+        if combinedString in myDict:
+            # print(combinedString, myDict[combinedString])
+            sum += log(myDict[combinedString]/size, 2)
+
+    sum = sum / len(sentenceSplitted)
+    print('Probability bigram smoothing for ' + sentence, sum)
+    return sum
