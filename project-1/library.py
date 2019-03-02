@@ -162,70 +162,33 @@ def questionTwo():
 
 def questionThree():
     myDict = createDictionaryUnigram()
-    sizeTraining = countSize('brown-train-after')
-    print('Size of training set ', sizeTraining)
-
-    # ** BROWN-TEST ** #
-    brownSet = createSet('brown-test-after')
-    countTokenBrownNotAppearsTrainning = countTokens(
-        myDict, 'brown-test-after')
-    countTypesBrownNotAppearTraining = countTypes(myDict, brownSet)
-    sizeBrownTest = countSize('brown-test-after')
-
-    print(countTokenBrownNotAppearsTrainning,
-          'how many tokens in brown not appear in training')
-    print(countTypesBrownNotAppearTraining,
-          'how many types in brown not appear in training')
-    print(sizeBrownTest, 'the size of the brown test / all words in brown test')
-
-    # COUNT OF HOW MANY WORD NOT APPEAR / COUNT OF HOW MANY WORD IN TRAINING
-    # COUNT OF HOW MANY THOSE ^ / SIZE OF THE TEST
-    percentageTokenBrown = countTokenBrownNotAppearsTrainning/sizeTraining
-
-    print(percentageTokenBrown, 'percentage token brown')
-    percentageTokenBrown = (percentageTokenBrown / sizeBrownTest) * 100
-
-    percentageTypesBrown = (countTypesBrownNotAppearTraining/sizeTraining)
-    percentageTypesBrown = (percentageTypesBrown / sizeBrownTest) * 100
-
-    # ** LEARNER-TEST ** #
-    learnerSet = createSet('learner-test-after')
-    countTokenLearnerNotAppearsTraining = countTokens(
-        myDict, 'learner-test-after')
-    countTypesLearnerNotAppearTraining = countTypes(myDict, learnerSet)
-    sizeLearnerTest = countSize('learner-test-after')
-
-    percentageTokenLearner = (countTokenLearnerNotAppearsTraining/sizeTraining)
-    percentageTokenLearner = (percentageTokenLearner / sizeLearnerTest) * 100
-
-    percentageTypesLearner = (countTypesLearnerNotAppearTraining/sizeTraining)
-    percentageTypesLearner = (percentageTypesLearner / sizeLearnerTest) * 100
-
-    print(countTypesLearnerNotAppearTraining,
-          ' count types appears learner test')
-    print(countTokenLearnerNotAppearsTraining,
-          ' count token appears learner test')
-    print(sizeLearnerTest, ' size of learner test')
-
-    print('Percentage of tokens in Learner not appear in training ',
-          percentageTokenLearner)
-    print('Percentage of types in Learner not appear in training ',
-          percentageTypesLearner)
-
-    # PRINTING OUT
-
-    # print(countTokenBrownNotAppearsTrainning,
-    #       ' count token appears brown test')
-    # print(countTypesBrownNotAppearTraining, ' count types appears brown test')
-    # print(sizeBrownTest, ' size of brown test')
-
-    # print('Percentage of tokens in Brown not appear in training ',
-    #       percentageTokenBrown)
-    # print('Percentage of types in Brown not appear in training ',
-    #       percentageTypesBrown)
-
+    percentage(myDict, 'brown-test-after')
+    percentage(myDict, 'learner-test-after')
 
 # helper function for question 3 #
+
+
+def percentage(myDict, url):
+    mySet = createSet(url)
+    sizeTypes = len(mySet)  # size of set (unique types)
+    countTokenNotAppearsTrainning = countTokens(myDict, url)
+    countTypesNotAppearsTraining = countTypes(myDict, mySet)
+    sizeTokens = countSize(url)  # size of token
+
+    print('Size of types in ' + url + '=', sizeTypes)
+    print('Size of tokens in ' + url + '=', sizeTokens)
+
+    print('How many tokens in ' + url + ' not appear in training = ',
+          countTokenNotAppearsTrainning)
+    print('How many types in ' + url + ' not appear in training = ',
+          countTypesNotAppearsTraining)
+
+    # COUNT OF HOW MANY WORD NOT APPEAR IN TRAINING / SIZE OF THE TEST
+    percentageToken = countTokenNotAppearsTrainning/sizeTokens
+    print('How many percentage token in ' + url + ' = ', percentageToken)
+
+    percentageTypes = (countTypesNotAppearsTraining/sizeTypes)
+    print('How many percentage types in ' + url + ' = ', percentageTypes)
 
 
 def createSet(url):
