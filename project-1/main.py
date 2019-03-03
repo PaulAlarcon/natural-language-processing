@@ -1,5 +1,5 @@
 import library
-
+import math
 # print('--Start padding <unk> and </unk> and lowercasing the files respectively--')
 # library.padSentence()
 # print('--End of padding <unk> and </unk> and lowercasing the files respectively--')
@@ -19,4 +19,5 @@ import library
 # library.questionThree()
 # library.questionFour()
 # library.questionFive()
-library.questionSix()
+# library.questionSix()
+library.questionSeven()
