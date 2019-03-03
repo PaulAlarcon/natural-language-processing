@@ -399,6 +399,7 @@ def probabilitySentenceUnigram(sentence, myDict, size):
 
     sum = sum / len(sentenceSplitted)
     print('Probability unigram for ' + sentence, sum)
+    # print(math.log(sum * -1, 2))
 
 
 def probabilitySentenceBigram(sentence, myDict, size):
@@ -418,7 +419,8 @@ def probabilitySentenceBigram(sentence, myDict, size):
     # print('done')
     sum = sum / len(sentenceSplitted)
     print('Probability bigram for ' + sentence, sum)
-    return sum
+    # print(math.exp(sum))
+    # print(math.log(sum * -1, 2))
 
 
 def probabilitySentenceBigramSmoothing(sentence, myDict, size):
@@ -436,7 +438,7 @@ def probabilitySentenceBigramSmoothing(sentence, myDict, size):
 
     sum = sum / len(sentenceSplitted)
     print('Probability bigram smoothing for ' + sentence, sum)
-    return sum
+    # print(math.log(sum * -1, 2))
 
 
 def questionSix():
@@ -514,7 +516,8 @@ def perplexityBigramSmoothing(sentence, myDict, size):
             # print(combinedString, myDict[combinedString])
             sum += math.log((myDict[combinedString] +
                              1)/(size + len(myDict)), 2)
-
+        else:
+            sum += math.log(1 / (size + len(myDict)), 2)
     sum = sum / len(sentenceSplitted)
     sum = math.log(sum * -1, 2)
     print('Bigram smoothing perplexity for ' + sentence + ' = ', sum)
@@ -551,7 +554,7 @@ def perplexityQ7Unigram(url):
             if string in dictUnigram:
                 sum += math.log(dictUnigram[string]/size, 2)
         # sum = sum / len(sentenceSplitted)
-    print(len(openRead))
+    # print(len(openRead))
     sum = sum / len(openRead)
     sum = math.log(sum * -1, 2)
     print('Unigram perplexity for ' + url + ' = ', sum)
@@ -559,7 +562,7 @@ def perplexityQ7Unigram(url):
 
 def perplexityQ7Bigram(url):
     dictBigram = createDictionaryBigram('brown-train-after-replaced-unk')
-    size = countSize('brown-train-after-replaced-unk')
+    size = countSizeBigram('brown-train-after-replaced-unk')
 
     openFile = open(url + '.txt', 'r')
     openRead = openFile.readlines()
@@ -575,14 +578,17 @@ def perplexityQ7Bigram(url):
                 # print(combinedString, myDict[combinedString])
                 sum += math.log(dictBigram[combinedString]/size, 2)
 
-    sum = sum / len(openRead)
+        sum = sum / len(sentenceSplitted)
+        # print('sum now ', sum)
+
+    # sum = sum / len(openRead)
     sum = math.log(sum * -1, 2)
     print('Bigram perplexity for ' + url + ' = ', sum)
 
 
 def perplexityQ7BigramSmoothing(url):
     dictBigram = createDictionaryBigram('brown-train-after-replaced-unk')
-    size = countSize('brown-train-after-replaced-unk')
+    size = countSizeBigram('brown-train-after-replaced-unk')
 
     openFile = open(url + '.txt', 'r')
     openRead = openFile.readlines()
@@ -598,7 +604,12 @@ def perplexityQ7BigramSmoothing(url):
                 # print(combinedString, myDict[combinedString])
                 sum += math.log((dictBigram[combinedString] +
                                  1)/(size + len(dictBigram)), 2)
+            else:
+                sum += math.log(1 / (size + len(dictBigram)), 2)
+        sum = sum / len(sentenceSplitted)
+        # print('sum now ', sum)
 
-    sum = sum / len(openRead)
+    # sum = sum / len(openRead)
+    # print(sum, 'yyay')
     sum = math.log(sum * -1, 2)
     print('Bigram smoothing perplexity for ' + url + ' = ', sum)

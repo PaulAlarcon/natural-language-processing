@@ -18,6 +18,6 @@ import math
 # library.questionTwo()
 # library.questionThree()
 # library.questionFour()
-# library.questionFive()
-# library.questionSix()
+library.questionFive()
+library.questionSix()
 library.questionSeven()
