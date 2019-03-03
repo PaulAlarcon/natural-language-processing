@@ -19,11 +19,6 @@ def padSentence():
 
 
 def paddingSentence(url):
-    # constant to append and prepend
-    prepend = '<s>'
-    append = '</s>'
-
-    # store all the strings from reading the files
     container = []
 
     # reading from the file
@@ -34,8 +29,8 @@ def paddingSentence(url):
         currentLine = currentLine.lower()  # lowercase everything
         lastIndex = len(currentLine) - 1
         currentLine = currentLine[:lastIndex] + ' ' + \
-            append + ' ' + currentLine[lastIndex:]
-        container.append(prepend + ' ' + currentLine)
+            '</s>' + ' ' + currentLine[lastIndex:]
+        container.append('<s>' + ' ' + currentLine)
     openFile.close()
 
     writeToFile(url+'-after.txt', container)
@@ -43,10 +38,10 @@ def paddingSentence(url):
 #-- create dictionary --#
 
 
-def createDictionaryUnigram():
+def createDictionaryUnigram(url):
     d = dict()  # my dictionary
 
-    openFile = open('brown-train-after.txt', 'r')
+    openFile = open(url + '.txt', 'r')
     openRead = openFile.readlines()
 
     for currentLine in openRead:
@@ -56,14 +51,14 @@ def createDictionaryUnigram():
             else:
                 d[oneString] = 1
 
-    writeDictToFile('dictionary-unigram-before-unk-dataset', d)
+    writeDictToFile('dictionary-unigram-' + url, d)
     return d
 
 
-def createDictionaryBigram():
+def createDictionaryBigram(url):
     d = dict()  # my dictionary
 
-    openFile = open('brown-train-after.txt', 'r')
+    openFile = open(url + '.txt', 'r')
     openRead = openFile.readlines()
 
     for currentLine in openRead:
@@ -76,12 +71,12 @@ def createDictionaryBigram():
             else:
                 d[combinedString] = 1
 
-    writeDictToFile('dictionary-bigram-before-unk-dataset', d)
+    writeDictToFile('dictionary-bigram-' + url, d)
     return d
 
 
 def createDictionaryBigramSmoothing():
-    d = createDictionaryBigram()
+    d = createDictionaryBigram('brown-train-after-replaced-unk')
 
     for key in d:
         d[key] = d[key] + 1
@@ -99,7 +94,7 @@ def writeDictToFile(url, d):
 
 
 def replaceOccuring():
-    d = createDictionaryUnigram()  # my dictionary
+    d = createDictionaryUnigram('brown-train-after')  # my dictionary
     print('--Replacing the word occured once in brown-train file with <unk>--')
     replaceOccuringOnce(d, 'brown-train-after')
 
@@ -160,25 +155,13 @@ def questionOne():
 
 
 def questionTwo():
-    count = 0
-
-    openFile = open('brown-train-after-replaced-unk.txt', 'r')
-    openRead = openFile.readlines()
-
-    for currentLine in openRead:
-        splittedSentence = currentLine.split(' ')
-        for word in splittedSentence:
-            if word != '\n':
-                count = count + 1
-
-    openFile.close()
-
+    count = countSize('brown-train-after-replaced-unk')
     print('Question 2: ', count)
 
 
 def questionThree():
     print('Question 3:')
-    myDict = createDictionaryUnigram()
+    myDict = createDictionaryUnigram('brown-train-after')
     percentageQ3(myDict, 'brown-test-after')
     percentageQ3(myDict, 'learner-test-after')
 
@@ -191,22 +174,7 @@ def percentageQ3(myDict, url):
     countTokenNotAppearsTrainning = countTokens(myDict, url)
     countTypesNotAppearsTraining = countTypes(myDict, mySet)
     sizeTokens = countSize(url)  # size of token
-
-    print('Size of types in ' + url + '=', sizeTypes)
-    print('Size of tokens in ' + url + '=', sizeTokens)
-
-    print('How many tokens in ' + url + ' not appear in training = ',
-          countTokenNotAppearsTrainning)
-    print('How many types in ' + url + ' not appear in training = ',
-          countTypesNotAppearsTraining)
-
-    # COUNT OF HOW MANY WORD NOT APPEAR IN TRAINING / SIZE OF THE TEST
-    percentageToken = countTokenNotAppearsTrainning/sizeTokens
-    print('How many percentage token in ' + url + ' = ', percentageToken)
-
-    percentageTypes = (countTypesNotAppearsTraining/sizeTypes)
-    print('How many percentage types in ' + url + ' = ', percentageTypes)
-
+    printPercentage(url, sizeTypes, sizeTokens, countTokenNotAppearsTrainning, countTypesNotAppearsTraining)
 
 def createSet(url):
     thisSet = set()
@@ -263,7 +231,7 @@ def countSize(url):  # return how many words in a text file
 
 def questionFour():
     print('Question 4:')
-    myDict = createDictionaryBigram()
+    myDict = createDictionaryBigram('brown-train-after-replaced-unk')
 
     percentageQ4(myDict, 'brown-test-after-replaced-unk')
     percentageQ4(myDict, 'learner-test-after-replaced-unk')
@@ -277,7 +245,9 @@ def percentageQ4(myDict, url):
     countTypesNotInTraining = countTypesBigram(myDict, mySet)
     countTokenNotInTraining = countTokensBigram(myDict, url)
     sizeTokens = countSizeBigram(url)
+    printPercentage(url, sizeTypes, sizeTokens, countTokenNotInTraining, countTypesNotInTraining)
 
+def printPercentage(url, sizeTypes, sizeTokens, countTokenNotInTraining, countTypesNotInTraining):
     print('Size of types in ' + url + '=', sizeTypes)
     print('Size of tokens in ' + url + '=', sizeTokens)
 
@@ -291,8 +261,7 @@ def percentageQ4(myDict, url):
 
     percentageTypes = (countTypesNotInTraining/sizeTypes)
     print('How many percentage types in ' + url + ' = ', percentageTypes)
-
-
+    
 def createSetBigram(url):
     thisSet = set()
     openFile = open(url + '.txt', 'r')
@@ -322,7 +291,7 @@ def countTokensBigram(myDict, url):
     openFile = open(url + '.txt', 'r')
     openRead = openFile.readlines()
 
-    unigramDict = createDictionaryUnigram()
+    unigramDict = createDictionaryUnigram('brown-train-after')
 
     for currentLine in openRead:
         split = currentLine.split(' ')
@@ -358,7 +327,7 @@ def countSizeBigram(url):
 
 
 def questionFive():
-    dictUnigram = createDictionaryUnigram()
+    dictUnigram = createDictionaryUnigram('brown-train-after')
     sizeOfToken = countSize('brown-train-after')
 
     fSentence = 'He was laughed off the screen .'
@@ -369,7 +338,7 @@ def questionFive():
     probabilitySentenceUnigram(sSentence, dictUnigram, sizeOfToken)
     probabilitySentenceUnigram(tSentence, dictUnigram, sizeOfToken)
 
-    dictBigram = createDictionaryBigram()
+    dictBigram = createDictionaryBigram('brown-train-after-replaced-unk')
 
     probabilitySentenceBigram(fSentence, dictBigram, sizeOfToken)
     probabilitySentenceBigram(sSentence, dictBigram, sizeOfToken)
@@ -447,3 +416,19 @@ def probabilitySentenceBigramSmoothing(string, myDict, size):
     sum = sum / len(sentenceSplitted)
     print('Probability bigram smoothing for ' + sentence, sum)
     return sum
+
+
+def questionSix():
+    print('Question 6:')
+    myDict = createDictionaryBigram('brown-train-after-replaced-unk')
+    fSentence = 'He was laughed off the screen'
+    sSentence = 'There was no compulsion behind them'
+    tSentence = 'I look forward to hearing your reply'
+
+    print(modifiedSentence(fSentence, myDict))
+    print(modifiedSentence(sSentence, myDict))
+    print(modifiedSentence(tSentence, myDict))
+
+
+def perplexity(string):
+    print(string)
