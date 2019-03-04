@@ -237,9 +237,9 @@ def printPercentage(url, sizeTypes, sizeTokens, countTokenNotInTraining, countTy
 
     print('\n')
     percentageToken = countTokenNotInTraining/sizeTokens
-    print('How many percentage token in ' + url + ' = ', percentageToken)
+    print('How many percentage token in ' + url + ' = ', round(percentageToken * 100, 2))
     percentageTypes = (countTypesNotInTraining/sizeTypes)
-    print('How many percentage types in ' + url + ' = ', percentageTypes)
+    print('How many percentage types in ' + url + ' = ', round(percentageTypes * 100, 2))
     print('\n')
 
 # end of helper function for question 3 #
