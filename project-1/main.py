@@ -13,11 +13,11 @@ import math
 
 # print('\n--**--**--**--\n')
 
-# print('Answering questions: ')
-# library.questionOne()
-# library.questionTwo()
-# library.questionThree()
-# library.questionFour()
+print('Answering questions: ')
+library.questionOne()
+library.questionTwo()
+library.questionThree()
+library.questionFour()
 library.questionFive()
 library.questionSix()
 library.questionSeven()

@@ -75,16 +75,6 @@ def createDictionaryBigram(url):
     return d
 
 
-def createDictionaryBigramSmoothing():
-    d = createDictionaryBigram('brown-train-after-replaced-unk')
-
-    for key in d:
-        d[key] = d[key] + 1
-
-    writeDictToFile('dictionary-bigram-smoothing', d)
-    return d
-
-
 def writeDictToFile(url, d):
     f = open(url + '.txt', 'w')
     f.write(str(d))
@@ -156,11 +146,39 @@ def questionOne():
     print('\n')
 
 
+def createSet(url):
+    thisSet = set()
+
+    openFile = open(url + '.txt', 'r')
+    openRead = openFile.readlines()
+
+    for currentLine in openRead:
+        for oneString in currentLine.split(' '):
+            if oneString not in thisSet:
+                thisSet.add(oneString)
+
+    return thisSet
+
+
 def questionTwo():
     count = countSize('brown-train-after-replaced-unk')
     print('Question 2:')
     print('Token words in training corpus: ', count)
     print('\n')
+
+
+def countSize(url):  # return how many words in a text file
+    count = 0
+    openFile = open(url + '.txt', 'r')
+    openRead = openFile.readlines()
+    for currentLine in openRead:
+        splittedSentence = currentLine.split(' ')
+        for word in splittedSentence:
+            if word != '\n':
+                count = count + 1
+
+    openFile.close()
+    return count
 
 
 def questionThree():
@@ -183,28 +201,12 @@ def percentageQ3(myDict, url):
                     countTokenNotAppearsTrainning, countTypesNotAppearsTraining)
 
 
-def createSet(url):
-    thisSet = set()
-
-    openFile = open(url + '.txt', 'r')
-    openRead = openFile.readlines()
-
-    for currentLine in openRead:
-        for oneString in currentLine.split(' '):
-            if oneString not in thisSet:
-                thisSet.add(oneString)
-
-    return thisSet
-
 # return how many unique value in set, not appear in the map/dictionary
-
-
 def countTypes(myDict, mySet):
     count = 0
     for item in mySet:
         if item not in myDict:
             count = count + 1
-
     return count
 
 # return how many tokens (all words) in the file not appear in the dict
@@ -223,18 +225,23 @@ def countTokens(myDict, url):
     return count
 
 
-def countSize(url):  # return how many words in a text file
-    count = 0
-    openFile = open(url + '.txt', 'r')
-    openRead = openFile.readlines()
-    for currentLine in openRead:
-        splittedSentence = currentLine.split(' ')
-        for word in splittedSentence:
-            if word != '\n':
-                count = count + 1
+def printPercentage(url, sizeTypes, sizeTokens, countTokenNotInTraining, countTypesNotInTraining):
+    print('Size of types in ' + url + '=', sizeTypes)
+    print('Size of tokens in ' + url + '=', sizeTokens)
+    print('\n')
 
-    openFile.close()
-    return count
+    print('How many tokens in ' + url + ' not appear in training = ',
+          countTokenNotInTraining)
+    print('How many types in ' + url + ' not appear in training = ',
+          countTypesNotInTraining)
+
+    print('\n')
+    percentageToken = countTokenNotInTraining/sizeTokens
+    print('How many percentage token in ' + url + ' = ', percentageToken)
+    percentageTypes = (countTypesNotInTraining/sizeTypes)
+    print('How many percentage types in ' + url + ' = ', percentageTypes)
+    print('\n')
+
 # end of helper function for question 3 #
 
 
@@ -256,24 +263,6 @@ def percentageQ4(myDict, url):
     sizeTokens = countSizeBigram(url)
     printPercentage(url, sizeTypes, sizeTokens,
                     countTokenNotInTraining, countTypesNotInTraining)
-
-
-def printPercentage(url, sizeTypes, sizeTokens, countTokenNotInTraining, countTypesNotInTraining):
-    print('Size of types in ' + url + '=', sizeTypes)
-    print('Size of tokens in ' + url + '=', sizeTokens)
-    print('\n')
-
-    print('How many tokens in ' + url + ' not appear in training = ',
-          countTokenNotInTraining)
-    print('How many types in ' + url + ' not appear in training = ',
-          countTypesNotInTraining)
-    print('\n')
-
-    percentageToken = countTokenNotInTraining/sizeTokens
-    print('How many percentage token in ' + url + ' = ', percentageToken)
-    percentageTypes = (countTypesNotInTraining/sizeTypes)
-    print('How many percentage types in ' + url + ' = ', percentageTypes)
-    print('\n')
 
 
 def createSetBigram(url):
@@ -343,33 +332,47 @@ def countSizeBigram(url):
 def questionFive():
     print('Question 5: ')
     dictUnigram = createDictionaryUnigram('brown-train-after-replaced-unk')
-    sizeOfToken = countSize('brown-train-after-replaced-unk')
-
-    fSentence = 'He was laughed off the screen .'
-    sSentence = 'There was no compulsion behind them .'
-    tSentence = 'I look forward to hearing your reply .'
-
-    fSentence = modifiedSentence(fSentence, dictUnigram)
-    sSentence = modifiedSentence(sSentence, dictUnigram)
-    tSentence = modifiedSentence(tSentence, dictUnigram)
-
-    probabilitySentenceUnigram(fSentence, dictUnigram, sizeOfToken)
-    probabilitySentenceUnigram(sSentence, dictUnigram, sizeOfToken)
-    probabilitySentenceUnigram(tSentence, dictUnigram, sizeOfToken)
-    print('\n')
     dictBigram = createDictionaryBigram('brown-train-after-replaced-unk')
 
-    probabilitySentenceBigram(fSentence, dictBigram, sizeOfToken)
-    probabilitySentenceBigram(sSentence, dictBigram, sizeOfToken)
-    probabilitySentenceBigram(tSentence, dictBigram, sizeOfToken)
+    sizeOfTraining = countSize('brown-train-after-replaced-unk')
+    sizeOfTrainingBigram = countSizeBigram('brown-train-after-replaced-unk')
+
+    fSentence = modifiedSentence(
+        'He was laughed off the screen .', dictUnigram)
+    sSentence = modifiedSentence(
+        'There was no compulsion behind them .', dictUnigram)
+    tSentence = modifiedSentence(
+        'I look forward to hearing your reply .', dictUnigram)
+
+    printProbabilitySentenceUnigram(
+        dictUnigram, sizeOfTraining, fSentence, sSentence, tSentence)
+    printProbabilitySentenceBigram(
+        dictBigram, sizeOfTrainingBigram, fSentence, sSentence, tSentence)
+    printProbabilitySentenceBigramSmoothing(
+        dictBigram, sizeOfTrainingBigram, fSentence, sSentence, tSentence)
+
+
+def printProbabilitySentenceUnigram(dictUnigram, sizeOfTraining, fSentence, sSentence, tSentence):
+    probabilitySentenceUnigram(fSentence, dictUnigram, sizeOfTraining)
+    probabilitySentenceUnigram(sSentence, dictUnigram, sizeOfTraining)
+    probabilitySentenceUnigram(tSentence, dictUnigram, sizeOfTraining)
     print('\n')
 
+
+def printProbabilitySentenceBigram(dictBigram, sizeOfTraining, fSentence, sSentence, tSentence):
+    probabilitySentenceBigram(fSentence, dictBigram, sizeOfTraining)
+    probabilitySentenceBigram(sSentence, dictBigram, sizeOfTraining)
+    probabilitySentenceBigram(tSentence, dictBigram, sizeOfTraining)
+    print('\n')
+
+
+def printProbabilitySentenceBigramSmoothing(dictBigram, sizeOfTraining, fSentence, sSentence, tSentence):
     probabilitySentenceBigramSmoothing(
-        fSentence, dictBigram, sizeOfToken)
+        fSentence, dictBigram, sizeOfTraining)
     probabilitySentenceBigramSmoothing(
-        sSentence, dictBigram, sizeOfToken)
+        sSentence, dictBigram, sizeOfTraining)
     probabilitySentenceBigramSmoothing(
-        tSentence, dictBigram, sizeOfToken)
+        tSentence, dictBigram, sizeOfTraining)
     print('\n')
 
 
@@ -386,90 +389,89 @@ def modifiedSentence(string, myDict):
 
 def probabilitySentenceUnigram(sentence, myDict, size):
     sentenceSplitted = sentence.split(' ')
-    # print(sentenceSplitted)
     sum = 0
 
     for string in sentenceSplitted:
         if string == '<s>':
             continue
-        # print(string)
         if string in myDict:
-            # print(string, myDict[string])
             sum += math.log(myDict[string]/size, 2)
 
     sum = sum / len(sentenceSplitted)
     print('Probability unigram for ' + sentence, sum)
-    # print(math.log(sum * -1, 2))
 
 
 def probabilitySentenceBigram(sentence, myDict, size):
     sentenceSplitted = sentence.split(' ')
-
     sum = 0
+
     for index in range(len(sentenceSplitted) - 1):
         combinedString = sentenceSplitted[index] + \
             ',' + sentenceSplitted[index+1]
-        # print(combinedString)
         if combinedString in myDict:
-            # print(combinedString, myDict[combinedString])
-            # print(log(myDict[combinedString]/size, 2))
             sum += math.log(myDict[combinedString]/size, 2)
-            # print('sum ', sum)
 
-    # print('done')
     sum = sum / len(sentenceSplitted)
     print('Probability bigram for ' + sentence, sum)
-    # print(math.exp(sum))
-    # print(math.log(sum * -1, 2))
 
 
 def probabilitySentenceBigramSmoothing(sentence, myDict, size):
     sentenceSplitted = sentence.split(' ')
-
     sum = 0
+
     for index in range(len(sentenceSplitted) - 1):
         combinedString = sentenceSplitted[index] + \
             ',' + sentenceSplitted[index+1]
-        # print(combinedString)
         if combinedString in myDict:
-            # print(combinedString, myDict[combinedString])
             sum += math.log((myDict[combinedString] +
                              1)/(size + len(myDict)), 2)
 
     sum = sum / len(sentenceSplitted)
     print('Probability bigram smoothing for ' + sentence, sum)
-    # print(math.log(sum * -1, 2))
 
 
 def questionSix():
     print('Question 6:')
     dictUnigram = createDictionaryUnigram('brown-train-after-replaced-unk')
     dictBigram = createDictionaryBigram('brown-train-after-replaced-unk')
+
     sizeOfToken = countSize('brown-train-after-replaced-unk')
+    sizeOfBigram = countSizeBigram('brown-train-after-replaced-unk')
 
-    fSentence = 'He was laughed off the screen'
-    sSentence = 'There was no compulsion behind them'
-    tSentence = 'I look forward to hearing your reply'
+    fSentence = modifiedSentence(
+        'He was laughed off the screen .', dictUnigram)
+    sSentence = modifiedSentence(
+        'There was no compulsion behind them .', dictUnigram)
+    tSentence = modifiedSentence(
+        'I look forward to hearing your reply .', dictUnigram)
 
-    fSentence = modifiedSentence(fSentence, dictUnigram)
-    sSentence = modifiedSentence(sSentence, dictUnigram)
-    tSentence = modifiedSentence(tSentence, dictUnigram)
+    printPerplexityUnigram(fSentence, sSentence,
+                           tSentence, dictUnigram, sizeOfToken)
+    printPerplexityBigram(fSentence, sSentence, tSentence,
+                          dictBigram, sizeOfBigram)
+    printPerplexityBigramSmoothing(
+        fSentence, sSentence, tSentence, dictBigram, sizeOfBigram)
 
+
+def printPerplexityUnigram(fSentence, sSentence, tSentence, dictUnigram, sizeOfToken):
     perplexityUnigram(fSentence, dictUnigram, sizeOfToken)
     perplexityUnigram(sSentence, dictUnigram, sizeOfToken)
     perplexityUnigram(tSentence, dictUnigram, sizeOfToken)
-
     print('\n')
-    sizeOfBigram = countSizeBigram('brown-train-after-replaced-unk')
+
+
+def printPerplexityBigram(fSentence, sSentence, tSentence, dictBigram, sizeOfBigram):
     perplexityBigram(fSentence, dictBigram, sizeOfBigram)
     perplexityBigram(sSentence, dictBigram, sizeOfBigram)
     perplexityBigram(tSentence, dictBigram, sizeOfBigram)
-
     print('\n')
 
+
+def printPerplexityBigramSmoothing(fSentence, sSentence, tSentence, dictBigram, sizeOfBigram):
     perplexityBigramSmoothing(fSentence, dictBigram, sizeOfBigram)
     perplexityBigramSmoothing(sSentence, dictBigram, sizeOfBigram)
     perplexityBigramSmoothing(tSentence, dictBigram, sizeOfBigram)
+    print('\n')
 
 
 def perplexityUnigram(sentence, myDict, size):
@@ -481,9 +483,10 @@ def perplexityUnigram(sentence, myDict, size):
             continue
         if string in myDict:
             sum += math.log(myDict[string]/size, 2)
-    sum = sum / len(sentenceSplitted)
 
+    sum = sum / len(sentenceSplitted)
     sum = math.log(sum * -1, 2)
+
     print('Unigram perplexity for ' + sentence + ' = ', sum)
 
 
@@ -493,15 +496,13 @@ def perplexityBigram(sentence, myDict, size):
     for index in range(len(sentenceSplitted) - 1):
         combinedString = sentenceSplitted[index] + \
             ',' + sentenceSplitted[index+1]
-        # print(combinedString)
         if combinedString in myDict:
-            # print(combinedString, myDict[combinedString])
             sum += math.log(myDict[combinedString]/size, 2)
 
     sum = sum / len(sentenceSplitted)
     sum = math.log(sum * -1, 2)
+
     print('Bigram perplexity for ' + sentence + ' = ', sum)
-    return sum
 
 
 def perplexityBigramSmoothing(sentence, myDict, size):
@@ -511,17 +512,16 @@ def perplexityBigramSmoothing(sentence, myDict, size):
     for index in range(len(sentenceSplitted) - 1):
         combinedString = sentenceSplitted[index] + \
             ',' + sentenceSplitted[index+1]
-        # print(combinedString)
         if combinedString in myDict:
-            # print(combinedString, myDict[combinedString])
             sum += math.log((myDict[combinedString] +
                              1)/(size + len(myDict)), 2)
         else:
             sum += math.log(1 / (size + len(myDict)), 2)
+
     sum = sum / len(sentenceSplitted)
     sum = math.log(sum * -1, 2)
+
     print('Bigram smoothing perplexity for ' + sentence + ' = ', sum)
-    return sum
 
 
 def questionSeven():
@@ -540,6 +540,7 @@ def perplexityQ7(url):
 def perplexityQ7Unigram(url):
     dictUnigram = createDictionaryUnigram('brown-train-after-replaced-unk')
     size = countSize('brown-train-after-replaced-unk')
+    # totalWord = countSize(url)
     sum = 0
 
     openFile = open(url + '.txt', 'r')
@@ -553,16 +554,17 @@ def perplexityQ7Unigram(url):
                 continue
             if string in dictUnigram:
                 sum += math.log(dictUnigram[string]/size, 2)
-        # sum = sum / len(sentenceSplitted)
-    # print(len(openRead))
-    sum = sum / len(openRead)
+        sum = sum / len(sentenceSplitted)
+    # sum = sum / totalWord
     sum = math.log(sum * -1, 2)
+
     print('Unigram perplexity for ' + url + ' = ', sum)
 
 
 def perplexityQ7Bigram(url):
     dictBigram = createDictionaryBigram('brown-train-after-replaced-unk')
     size = countSizeBigram('brown-train-after-replaced-unk')
+    # totalWord = countSizeBigram(url)
 
     openFile = open(url + '.txt', 'r')
     openRead = openFile.readlines()
@@ -573,15 +575,10 @@ def perplexityQ7Bigram(url):
         for index in range(len(sentenceSplitted) - 1):
             combinedString = sentenceSplitted[index] + \
                 ',' + sentenceSplitted[index+1]
-            # print(combinedString)
             if combinedString in dictBigram:
-                # print(combinedString, myDict[combinedString])
                 sum += math.log(dictBigram[combinedString]/size, 2)
-
         sum = sum / len(sentenceSplitted)
-        # print('sum now ', sum)
-
-    # sum = sum / len(openRead)
+    # sum = sum / totalWord
     sum = math.log(sum * -1, 2)
     print('Bigram perplexity for ' + url + ' = ', sum)
 
@@ -589,7 +586,7 @@ def perplexityQ7Bigram(url):
 def perplexityQ7BigramSmoothing(url):
     dictBigram = createDictionaryBigram('brown-train-after-replaced-unk')
     size = countSizeBigram('brown-train-after-replaced-unk')
-
+    totalWord = countSizeBigram(url)
     openFile = open(url + '.txt', 'r')
     openRead = openFile.readlines()
 
@@ -607,9 +604,7 @@ def perplexityQ7BigramSmoothing(url):
             else:
                 sum += math.log(1 / (size + len(dictBigram)), 2)
         sum = sum / len(sentenceSplitted)
-        # print('sum now ', sum)
-
-    # sum = sum / len(openRead)
-    # print(sum, 'yyay')
+    # divide by total number of words in the test
+    # sum = sum / totalWord
     sum = math.log(sum * -1, 2)
     print('Bigram smoothing perplexity for ' + url + ' = ', sum)
