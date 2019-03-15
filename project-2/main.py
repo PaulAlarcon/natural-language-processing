@@ -1,29 +1,75 @@
-training = ['Chinese Beijing Chinese', 'Chinese Chinese Shanghai',
-            'Chinese Macao', 'Tokyo Japan Chinese']
+from __future__ import division
+import library
 
-trainingOneDoc = ''
-# combining into one big document
-for str in training:
-    trainingOneDoc = trainingOneDoc + str + ' '
-print('The training now is: ')
-print(trainingOneDoc)
+# ----- --------- -------
+# start of total document
+trainingTotal = ['Chinese Beijing Chinese', 'Chinese Chinese Shanghai',
+                 'Chinese Macao', 'Tokyo Japan Chinese']
 
-splittedTraining = trainingOneDoc.split(' ')
-print('The training one log document is splitted into')
-print(splittedTraining)
+trainingTotalBigDocument = library.createBigDocument(trainingTotal)
+splittedTrainingTotal = library.createSplitDocument(trainingTotalBigDocument)
 
-dictionary = {}
-for str in splittedTraining:
-    if str == "":
-        continue
-    if str in dictionary:
-        dictionary[str] = dictionary[str] + 1
-    else:
-        dictionary[str] = 1
+dictionaryTotal = library.createDictionary(splittedTrainingTotal)
+library.printDictionaryKeyValue(dictionaryTotal)
 
-print('Start the dictionary iteration')
-for key in dictionary:
-    print(dictionary[key])
-    print(key + ' ')
+totalWordInVocabulary = len(dictionaryTotal)
+print(totalWordInVocabulary)
+
+# ----- --------- ---------
+# start of c class training
+trainingClassC = ['Chinese Beijing Chinese',
+                  'Chinese Chinese Shanghai', 'Chinese Macao']
+trainingClassCBigDocument = library.createBigDocument(trainingClassC)
+
+splittedTrainingClassC = library.createSplitDocument(trainingClassCBigDocument)
+totalWordInVocabularyClassC = library.getSizeOfDocument(
+    trainingClassCBigDocument)
+print(totalWordInVocabularyClassC)
+
+dictionaryClassC = library.createDictionary(splittedTrainingClassC)
+library.printDictionaryKeyValue(dictionaryClassC)
+
+
+# ----- --------- ---------
+# start of j class training
+trainingClassJ = ['Tokyo Japan Chinese']
+trainingClassJBigDocument = library.createBigDocument(trainingClassJ)
+splittedTrainingClassJ = library.createSplitDocument(trainingClassJBigDocument)
+
+dictionaryClassJ = library.createDictionary(splittedTrainingClassJ)
+library.printDictionaryKeyValue(dictionaryClassJ)
+
+totalWordInVocabularyClassJ = library.getSizeOfDocument(
+    trainingClassJBigDocument)
+print(totalWordInVocabularyClassJ)
+
+# -------
+# example
+
+prob = library.getProbability(
+    dictionaryClassC, 'Chinese', totalWordInVocabularyClassC, totalWordInVocabulary)
+print('P(Chinese|c) = ' + `prob`)
+
+prob = library.getProbability(
+    dictionaryClassC, 'Tokyo', totalWordInVocabularyClassC, totalWordInVocabulary)
+print('P(Tokyo|c) = ' + `prob`)
+
+
+prob = library.getProbability(
+    dictionaryClassC, 'Japan', totalWordInVocabularyClassC, totalWordInVocabulary)
+print('P(Japan|c) = ' + `prob`)
+
+prob = library.getProbability(
+    dictionaryClassJ, 'Chinese', totalWordInVocabularyClassJ, totalWordInVocabulary)
+
+print('P(Chinese|j) = ' + `prob`)
+
+prob = library.getProbability(
+    dictionaryClassJ, 'Tokyo', totalWordInVocabularyClassJ, totalWordInVocabulary)
+print('P(Tokyo|j) = ' + `prob`)
+
+prob = library.getProbability(
+    dictionaryClassJ, 'Japan', totalWordInVocabularyClassJ, totalWordInVocabulary)
+print('P(Japan|j) = ' + `prob`)
 
 test = 'Chinese Chinese Chinese Tokyo Japan'
