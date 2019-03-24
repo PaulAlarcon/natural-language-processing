@@ -46,6 +46,24 @@ def positiveReview():
     f.close()
 
 
+def createPositiveDict():
+    f = open('OneBigPositiveReview.txt', 'r+')
+    positiveReviewDict = {}
+
+    for string in f:
+        splittedStr = string.split(" ")
+
+        for item in splittedStr:
+            if item in positiveReviewDict:
+                positiveReviewDict[item] = positiveReviewDict[item] + 1
+            else:
+                positiveReviewDict[item] = 1
+
+    f.close()
+
+    return positiveReviewDict
+
+
 def negativeReview():
     # use this to refer to my original working directory
     myWorkingDirectory = os.getcwd()
@@ -85,6 +103,27 @@ def negativeReview():
     f = open('OneBigNegativeReview.txt', 'w+')
     for sentence in containerForNegativeReviews:
         f.write(sentence + ' \n')
+
+
+def createNegativeDict():
+    f = open('OneBigNegativeReview.txt', 'r+')
+    negativeReviewDict = {}
+
+    for string in f:
+        splittedStr = string.split(" ")
+
+        for item in splittedStr:
+            if item in negativeReviewDict:
+                negativeReviewDict[item] = negativeReviewDict[item] + 1
+            else:
+                negativeReviewDict[item] = 1
+
+    f.close()
+
+    return negativeReviewDict
+
+# -------------
+# EXAMPLE CODE
 
 
 def OneBigJumbleCodeWithExplanation():
@@ -132,3 +171,26 @@ def OneBigJumbleCodeWithExplanation():
     f = open('smallCode.txt', 'w+')
     for sentence in containerForNegativeReviews:
         f.write(sentence + ' \n')
+
+
+def DictionaryTest():
+    f = open('smallCode.txt', 'r+')
+    testDict = {}
+    numberOfWord = 0
+
+    for string in f:
+        splittedStr = string.split(" ")
+        print(splittedStr)
+        # print(len(splittedStr))
+        numberOfWord = numberOfWord + len(splittedStr)
+        print(numberOfWord)
+        for item in splittedStr:
+            if item in testDict:
+                testDict[item] = testDict[item] + 1
+            else:
+                testDict[item] = 1
+
+    # or another way to calculate the number of words
+    anotherWayNumberOfWord = sum(testDict.values())
+    print(anotherWayNumberOfWord)
+    f.close()
