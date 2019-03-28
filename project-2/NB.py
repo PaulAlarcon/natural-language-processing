@@ -4,181 +4,123 @@
 # first column is the label, other column are feature value
 from __future__ import division
 
-# start answer for movie-review-small
-sentences_all = []
 
-with open('movie-review-small.NB', 'r') as movie_review_text:
-    for line in movie_review_text:
-        current_sentence = line[:-1]
-        sentences_all.append(current_sentence)
+def NB(training_file, test_file, parameter_file, result_file):
+    sentences_all = []
+    label = []
 
-movie_review_small_action = []
-movie_review_small_comedy = []
-dict_action = {}
-dict_comedy = {}
-dict_both = {}
-count_comedy_sentence = 0
-count_action_sentence = 0
+    with open(training_file, 'r') as training_file_open:
+        for line in training_file_open:
+            current_sentence = line[:-1]
+            splitted_sentence = current_sentence.split(",")
+            if splitted_sentence[0] not in label:
+                label.append(splitted_sentence[0])
+            sentences_all.append(current_sentence)
 
-for sentence in sentences_all:
-    sentence_splitted = sentence.split(',')
+    dict_first_label = {}
+    dict_second_label = {}
+    dict_both = {}
 
-    if sentence_splitted[0] == 'comedy':
-        count_comedy_sentence = count_comedy_sentence + 1
+    count_first_label_sentence = 0
+    count_second_label_sentence = 0
 
-        for feature in sentence_splitted[1].split(" "):
-            movie_review_small_comedy.append(feature)
+    # creating dictionary for both label
+    # storing each unique values in both label
+    # counting how many sentences in both label
+    for sentence in sentences_all:
+        sentence_splitted = sentence.split(',')
 
-            if feature in dict_comedy.keys():
-                dict_comedy[feature] = dict_comedy[feature] + 1
-            else:
-                dict_comedy[feature] = 1
+        if sentence_splitted[0] == label[0]:
+            count_first_label_sentence = count_first_label_sentence + 1
 
-            if feature not in dict_both.keys():
-                dict_both[feature] = feature
-    else:
-        count_action_sentence = count_action_sentence + 1
+            for feature in sentence_splitted[1].split(" "):
+                if feature in dict_first_label.keys():
+                    dict_first_label[feature] = dict_first_label[feature] + 1
+                else:
+                    dict_first_label[feature] = 1
 
-        for feature in sentence_splitted[1].split(" "):
-            movie_review_small_action.append(feature)
-
-            if feature in dict_action.keys():
-                dict_action[feature] = dict_action[feature] + 1
-            else:
-                dict_action[feature] = 1
-
-            if feature not in dict_both.keys():
-                dict_both[feature] = feature
-
-size_dict_action = sum(dict_action.values())
-size_dict_comedy = sum(dict_comedy.values())
-size_vocab = len(dict_both)
-
-output = open('movie-review-small-output-parameter.txt', 'w+')
-
-# calculating probabilities for the dictionary
-dict_answer = {}
-for key in dict_both.keys():
-    string = 'P(' + key + '|action)'
-    if key not in dict_action.keys():
-        calculation = 1 / (size_dict_action + size_vocab)
-    else:
-        calculation = (dict_action[key] + 1)/(size_dict_action + size_vocab)
-
-    dict_answer[string] = calculation
-
-    string = string + ' = ' + str(calculation)
-    output.write(string + '\n')
-
-for key in dict_both.keys():
-    string = 'P(' + key + '|comedy)'
-    if key not in dict_comedy.keys():
-        calculation = 1 / (size_dict_comedy + size_vocab)
-    else:
-        calculation = (dict_comedy[key] + 1)/(size_dict_comedy + size_vocab)
-
-    dict_answer[string] = calculation
-
-    string = string + ' = ' + str(calculation)
-    output.write(string + '\n')
-
-string = 'P(action)'
-calculationAction = count_action_sentence / \
-    (count_action_sentence + count_comedy_sentence)
-dict_answer[string] = calculationAction
-
-string = string + ' = ' + str(calculationAction)
-output.write(string + '\n')
-
-string = 'P(comedy)'
-calculationComedy = count_comedy_sentence / \
-    (count_action_sentence + count_comedy_sentence)
-dict_answer[string] = calculationComedy
-string = string + ' = ' + str(calculationComedy)
-output.write(string + '\n')
-print(dict_answer)
-
-test = ['fast', 'couple', 'shoot', 'fly']
-
-probabilityAction = dict_answer['P(action)']
-print(probabilityAction)
-for string in test:
-    key = 'P(' + string + '|action)'
-    print(key)
-    print(dict_answer[key])
-    probabilityAction = probabilityAction * dict_answer[key]
-
-print(probabilityAction)
-output.write('P(fast, couple, shoot, fly | action) = ' +
-             str(probabilityAction) + '\n')
-
-probabilityComedy = dict_answer['P(comedy)']
-print(probabilityComedy)
-for string in test:
-    key = 'P(' + string + '|comedy)'
-    print(key)
-    print(dict_answer[key])
-    probabilityComedy = probabilityComedy * dict_answer[key]
-
-print(probabilityComedy)
-output.write('P(fast, couple, shoot, fly | comedy) = ' +
-             str(probabilityComedy) + '\n')
-
-
-def notused():
-    fAction = open('movie-review-small-action.txt', 'w+')
-    fComedy = open('movie-review-small-comedy.txt', 'w+')
-
-    for string in sentences_all:
-        stringSplitted = string.split(',')
-        index = 0
-        if stringSplitted[0] == 'comedy':
-            for each in stringSplitted:
-                if index == 0:
-                    index = index + 1
-                    continue
-                fComedy.write(each)
-            fComedy.write(' ')
+                if feature not in dict_both.keys():
+                    dict_both[feature] = feature
         else:
-            for each in stringSplitted:
-                if index == 0:
-                    index = index + 1
+            count_second_label_sentence = count_second_label_sentence + 1
+
+            for feature in sentence_splitted[1].split(" "):
+                if feature in dict_second_label.keys():
+                    dict_second_label[feature] = dict_second_label[feature] + 1
+                else:
+                    dict_second_label[feature] = 1
+
+                if feature not in dict_both.keys():
+                    dict_both[feature] = feature
+
+    size_dict_second_label = sum(dict_second_label.values())
+    size_dict_first_label = sum(dict_first_label.values())
+    size_vocab = len(dict_both)
+
+    # calculating parameters and storing it inside the parameter file
+    parameter_output = open(parameter_file, 'w+')
+    dict_answer = {}
+    for key in dict_both.keys():
+        string = 'P(' + key + '|' + label[1] + ')'
+        if key not in dict_second_label.keys():
+            calculation = 1 / (size_dict_second_label + size_vocab)
+        else:
+            calculation = (dict_second_label[key] + 1) / \
+                (size_dict_second_label + size_vocab)
+
+        dict_answer[string] = calculation
+
+        string = string + ' = ' + str(calculation)
+        parameter_output.write(string + '\n')
+
+        string = 'P(' + key + '|' + label[0] + ')'
+        if key not in dict_first_label.keys():
+            calculation = 1 / (size_dict_first_label + size_vocab)
+        else:
+            calculation = (dict_first_label[key] + 1) / \
+                (size_dict_first_label + size_vocab)
+
+        dict_answer[string] = calculation
+
+        string = string + ' = ' + str(calculation)
+        parameter_output.write(string + '\n')
+
+    string = 'P(action)'
+    calculationAction = count_second_label_sentence / \
+        (count_second_label_sentence + count_first_label_sentence)
+    dict_answer[string] = calculationAction
+
+    string = string + ' = ' + str(calculationAction)
+    parameter_output.write(string + '\n')
+
+    string = 'P(comedy)'
+    calculationComedy = count_first_label_sentence / \
+        (count_second_label_sentence + count_first_label_sentence)
+    dict_answer[string] = calculationComedy
+    string = string + ' = ' + str(calculationComedy)
+    parameter_output.write(string + '\n')
+    print(dict_answer)
+    # end of printing parameter
+
+    test_reader = open(test_file, 'r+')
+    result_file = open(result_file, 'w+')
+    for sentence in test_reader:
+        sentence_splitted = sentence.split(" ")
+        for each_label in label:
+            answer = 'P('
+            string = 'P(' + each_label + ')'
+            probability_answer = dict_answer[string]
+            for item in sentence_splitted:
+                if item == "\n":
                     continue
-                fAction.write(each)
-            fAction.write(' ')
+                key = 'P(' + item + '|' + each_label + ')'
+                answer = answer + item
+                print(key)
+                probability_answer = probability_answer * dict_answer[key]
 
-    fAction.close()
-    fComedy.close()
-
-    fAction = open('movie-review-small-action.txt', 'r+')
-    dictAction = {}
-    for item in fAction:
-        itemSplitted = item.split(" ")
-        for eachItem in itemSplitted:
-            if eachItem == '':
-                continue
-            if eachItem in dictAction.keys():
-                dictAction[eachItem] = dictAction[eachItem] + 1
-            else:
-                dictAction[eachItem] = 1
-
-    fComedy = open('movie-review-small-comedy.txt', 'r+')
-    dictComedy = {}
-    for item in fComedy:
-        itemSplitted = item.split(" ")
-        for eachItem in itemSplitted:
-            if eachItem == '':
-                continue
-            if eachItem in dictComedy.keys():
-                dictComedy[eachItem] = dictComedy[eachItem] + 1
-            else:
-                dictComedy[eachItem] = 1
-
-# print('Dictionary in action')
-# print(dictAction)
-# print('Dictionary in comedy')
-# print(dictComedy)
+            answer = answer + '|' + each_label + ') = '
+            result_file.write(answer + str(probability_answer) + '\n')
 
 
-def NB(trainingFile, testFile, fileParameter, outputFile):
-    print('Naive Bayes Algorithm')
+NB('movie-review-small-training.txt',
+   'movie-review-small-test.txt', 'movie-review-small.NB', 'movie-review-small-output.txt')

@@ -1,5 +1,16 @@
-comedy,fun couple love love
-action,fast furious shoot
-comedy,couple fly fast fun fun
-action,furious shoot shoot fun
-action,fly fast shoot love
+P(shoot|action) = 0.277777777778
+P(shoot|comedy) = 0.0625
+P(fly|action) = 0.111111111111
+P(fly|comedy) = 0.125
+P(love|action) = 0.111111111111
+P(love|comedy) = 0.1875
+P(couple|action) = 0.0555555555556
+P(couple|comedy) = 0.1875
+P(fast|action) = 0.166666666667
+P(fast|comedy) = 0.125
+P(furious|action) = 0.166666666667
+P(furious|comedy) = 0.0625
+P(fun|action) = 0.111111111111
+P(fun|comedy) = 0.25
+P(action) = 0.6
+P(comedy) = 0.4
