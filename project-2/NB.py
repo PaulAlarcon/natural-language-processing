@@ -13,53 +13,76 @@ def NB(training_file, test_file, parameter_file, result_file):
         for line in training_file_open:
             current_sentence = line[:-1]
             splitted_sentence = current_sentence.split(",")
+
             if splitted_sentence[0] not in label:
                 label.append(splitted_sentence[0])
+
             sentences_all.append(current_sentence)
 
-    dict_first_label = {}
-    dict_second_label = {}
-    dict_both = {}
+    dict_first_label = createDict(sentences_all, label[0])
+    dict_second_label = createDict(sentences_all, label[1])
+    dict_both = createVocab(sentences_all)
 
-    count_first_label_sentence = 0
-    count_second_label_sentence = 0
+    size_dict_first_label = sum(dict_first_label.values())
+    size_dict_second_label = sum(dict_second_label.values())
+    size_vocab = len(dict_both)
 
-    # creating dictionary for both label
-    # storing each unique values in both label
-    # counting how many sentences in both label
+    count_first_label_sentence = countSentence(sentences_all, label[0])
+    count_second_label_sentence = countSentence(sentences_all, label[1])
+
+    parameter_output = open(parameter_file, 'w+')
+    dict_answer = {}
+
+    writeParameter(parameter_output, dict_first_label, dict_second_label, dict_both,
+                   label, dict_answer, count_first_label_sentence, count_second_label_sentence)
+
+    writeResult(test_file, result_file, label, dict_answer)
+
+    print(dict_answer)
+
+
+def createDict(sentences_all, label):
+    my_dict = {}
     for sentence in sentences_all:
         sentence_splitted = sentence.split(',')
 
-        if sentence_splitted[0] == label[0]:
-            count_first_label_sentence = count_first_label_sentence + 1
-
+        if sentence_splitted[0] == label:
             for feature in sentence_splitted[1].split(" "):
-                if feature in dict_first_label.keys():
-                    dict_first_label[feature] = dict_first_label[feature] + 1
+                if feature in my_dict.keys():
+                    my_dict[feature] = my_dict[feature] + 1
                 else:
-                    dict_first_label[feature] = 1
+                    my_dict[feature] = 1
+    return my_dict
 
-                if feature not in dict_both.keys():
-                    dict_both[feature] = feature
-        else:
-            count_second_label_sentence = count_second_label_sentence + 1
 
-            for feature in sentence_splitted[1].split(" "):
-                if feature in dict_second_label.keys():
-                    dict_second_label[feature] = dict_second_label[feature] + 1
-                else:
-                    dict_second_label[feature] = 1
+def createVocab(sentences_all):
+    my_dict = {}
+    for sentence in sentences_all:
+        sentence_splitted = sentence.split(',')
 
-                if feature not in dict_both.keys():
-                    dict_both[feature] = feature
+        for feature in sentence_splitted[1].split(" "):
+            if feature not in my_dict.keys():
+                my_dict[feature] = 0
 
-    size_dict_second_label = sum(dict_second_label.values())
+    return my_dict
+
+
+def countSentence(sentences_all, label):
+    count = 0
+    for sentence in sentences_all:
+        sentence_splitted = sentence.split(',')
+
+        if sentence_splitted[0] == label:
+            count = count + 1
+
+    return count
+
+
+def writeParameter(parameter_output, dict_first_label, dict_second_label, dict_both, label, dict_answer, count_first_label_sentence, count_second_label_sentence):
     size_dict_first_label = sum(dict_first_label.values())
+    size_dict_second_label = sum(dict_second_label.values())
     size_vocab = len(dict_both)
 
-    # calculating parameters and storing it inside the parameter file
-    parameter_output = open(parameter_file, 'w+')
-    dict_answer = {}
     for key in dict_both.keys():
         string = 'P(' + key + '|' + label[1] + ')'
         if key not in dict_second_label.keys():
@@ -99,9 +122,9 @@ def NB(training_file, test_file, parameter_file, result_file):
     dict_answer[string] = calculationComedy
     string = string + ' = ' + str(calculationComedy)
     parameter_output.write(string + '\n')
-    print(dict_answer)
-    # end of printing parameter
 
+
+def writeResult(test_file, result_file, label, dict_answer):
     test_reader = open(test_file, 'r+')
     result_file = open(result_file, 'w+')
     for sentence in test_reader:
@@ -115,7 +138,6 @@ def NB(training_file, test_file, parameter_file, result_file):
                     continue
                 key = 'P(' + item + '|' + each_label + ')'
                 answer = answer + item
-                print(key)
                 probability_answer = probability_answer * dict_answer[key]
 
             answer = answer + '|' + each_label + ') = '
