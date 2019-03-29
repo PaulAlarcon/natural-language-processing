@@ -23,10 +23,6 @@ def NB(training_file, test_file, parameter_file, result_file):
     dict_second_label = createDict(sentences_all, label[1])
     dict_both = createVocab(sentences_all)
 
-    size_dict_first_label = sum(dict_first_label.values())
-    size_dict_second_label = sum(dict_second_label.values())
-    size_vocab = len(dict_both)
-
     count_first_label_sentence = countSentence(sentences_all, label[0])
     count_second_label_sentence = countSentence(sentences_all, label[1])
 
