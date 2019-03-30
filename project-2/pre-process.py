@@ -35,8 +35,8 @@ def combineTrainingReview(my_working_dir, directory, class_file, label):
     os.chdir(my_working_dir)
     f = open('movie-review-' + class_file + '-training.txt', 'w+')
     for sentence in container_review:
-        f.write(label + ' ' + sentence + ' \n')
-        one_big_training_document.write(label + ' ' + sentence + ' \n')
+        f.write(label + sentence + ' \n')
+        one_big_training_document.write(label + sentence + ' \n')
     f.close()
 
 
@@ -69,10 +69,10 @@ def combineTestReview(my_working_dir, directory, class_file):
 
 
 combineTrainingReview(my_working_dir,
-                      'movie-review-HW2/aclImdb/train/pos', 'positive', '+pos+')
+                      'movie-review-HW2/aclImdb/train/pos', 'positive', '+,')
 
 combineTrainingReview(my_working_dir,
-                      'movie-review-HW2/aclImdb/train/neg', 'negative', '-neg-')
+                      'movie-review-HW2/aclImdb/train/neg', 'negative', '-,')
 
 combineTestReview(
     my_working_dir, 'movie-review-HW2/aclImdb/test/pos', 'positive')

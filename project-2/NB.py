@@ -3,45 +3,108 @@
 # training and test should've this format: one ex per line, each line corresponds to one example
 # first column is the label, other column are feature value
 from __future__ import division
+import datetime
+
+my_vocab = {}
+vocab_file = open('./movie-review-HW2/aclImdb/imdb.vocab')
+for word in vocab_file:
+    current_word = word[:-1]
+    my_vocab[current_word] = 1
+
+print(my_vocab)
 
 
 def NB(training_file, test_file, parameter_file, result_file):
+    currentDT = datetime.datetime.now()
+    print (str(currentDT))
+
     sentences_all = []
     label = []
 
     with open(training_file, 'r') as training_file_open:
         for line in training_file_open:
             current_sentence = line[:-1]
-            splitted_sentence = current_sentence.split(",")
-
+            splitted_sentence = current_sentence.split(",", 1)
+            # print(splitted_sentence)
             if splitted_sentence[0] not in label:
                 label.append(splitted_sentence[0])
 
             sentences_all.append(current_sentence)
 
-    dict_first_label = createDict(sentences_all, label[0])
-    dict_second_label = createDict(sentences_all, label[1])
-    dict_both = createVocab(sentences_all)
+    print('done appending')
+    dict_first_label = {}
+    dict_second_label = {}
+    dict_both = {}
+    createDict(sentences_all, label, dict_first_label,
+               dict_second_label, dict_both)
+
+    # dict_first_label = createDict2(sentences_all, label[0])
+    # print('success creating first dict')
+
+    # dict_second_label = createDict2(sentences_all, label[1])
+    # print('success creating second dict')
+
+    # dict_both = createVocab(sentences_all)
+    # print('success creating both dict')
 
     count_first_label_sentence = countSentence(sentences_all, label[0])
+    print('success count first label')
+
     count_second_label_sentence = countSentence(sentences_all, label[1])
+    print('success creating second dict')
 
     parameter_output = open(parameter_file, 'w+')
     dict_answer = {}
 
+    print('begin writing params')
     writeParameter(parameter_output, dict_first_label, dict_second_label, dict_both,
                    label, dict_answer, count_first_label_sentence, count_second_label_sentence)
 
+    # hmm = open('open.txt', 'w+')
+    # for key in dict_both.keys():
+    #     hmm.write(key + '  ' + str(dict_both[key]) + ' \n')
+
+    # print(dict_answer)
+    # print('begin writing result')
+
     writeResult(test_file, result_file, label, dict_answer)
 
-    print(dict_answer)
+    currentDT = datetime.datetime.now()
+    print (str(currentDT))
+    # print(dict_answer)
 
 
-def createDict(sentences_all, label):
+def createDict(sentences_all, label, dict_first_label, dict_second_label, dict_both):
+    index = 0
+    for sentence in sentences_all:
+        print(index)
+        sentence_splitted = sentence.split(",", 1)
+
+        if sentence_splitted[0] == label[0]:
+            for feature in sentence_splitted[1].split(" "):
+                if feature in dict_first_label.keys():
+                    dict_first_label[feature] = dict_first_label[feature] + 1
+                else:
+                    dict_first_label[feature] = 1
+
+                if feature not in dict_both.keys():
+                    dict_both[feature] = 1
+        else:
+            for feature in sentence_splitted[1].split(" "):
+                if feature in dict_second_label.keys():
+                    dict_second_label[feature] = dict_second_label[feature] + 1
+                else:
+                    dict_second_label[feature] = 1
+
+                if feature not in dict_both.keys():
+                    dict_both[feature] = feature
+        index = index + 1
+
+
+def createDict2(sentences_all, label):
     my_dict = {}
     for sentence in sentences_all:
-        sentence_splitted = sentence.split(',')
-
+        sentence_splitted = sentence.split(",", 1)
         if sentence_splitted[0] == label:
             for feature in sentence_splitted[1].split(" "):
                 if feature in my_dict.keys():
@@ -54,8 +117,8 @@ def createDict(sentences_all, label):
 def createVocab(sentences_all):
     my_dict = {}
     for sentence in sentences_all:
-        sentence_splitted = sentence.split(',')
-
+        sentence_splitted = sentence.split(",", 1)
+        print(sentence_splitted)
         for feature in sentence_splitted[1].split(" "):
             if feature not in my_dict.keys():
                 my_dict[feature] = 0
@@ -104,7 +167,7 @@ def writeParameter(parameter_output, dict_first_label, dict_second_label, dict_b
         string = string + ' = ' + str(calculation)
         parameter_output.write(string + '\n')
 
-    string = 'P(action)'
+    string = 'P(' + label[1] + ')'
     calculationAction = count_second_label_sentence / \
         (count_second_label_sentence + count_first_label_sentence)
     dict_answer[string] = calculationAction
@@ -112,7 +175,7 @@ def writeParameter(parameter_output, dict_first_label, dict_second_label, dict_b
     string = string + ' = ' + str(calculationAction)
     parameter_output.write(string + '\n')
 
-    string = 'P(comedy)'
+    string = 'P(' + label[0] + ')'
     calculationComedy = count_first_label_sentence / \
         (count_second_label_sentence + count_first_label_sentence)
     dict_answer[string] = calculationComedy
@@ -125,6 +188,7 @@ def writeResult(test_file, result_file, label, dict_answer):
     result_file = open(result_file, 'w+')
     for sentence in test_reader:
         sentence_splitted = sentence.split(" ")
+        answer_dict = {}
         for each_label in label:
             answer = 'P('
             string = 'P(' + each_label + ')'
@@ -137,8 +201,17 @@ def writeResult(test_file, result_file, label, dict_answer):
                 probability_answer = probability_answer * dict_answer[key]
 
             answer = answer + '|' + each_label + ') = '
+            answer_dict[each_label] = probability_answer
             result_file.write(answer + str(probability_answer) + '\n')
 
+        if answer_dict[label[0]] > answer_dict[label[1]]:
+            result_file.write(label[0] + ', ' + sentence)
+        else:
+            result_file.write(label[1] + ', ' + sentence)
 
-NB('movie-review-small-training.txt',
-   'movie-review-small-test.txt', 'movie-review-small.NB', 'movie-review-small-output.txt')
+
+# NB('movie-review-small-training.txt',
+#    'movie-review-small-test.txt', 'movie-review-small.NB', 'movie-review-small-output.txt')
+
+# NB('movie-review-combined-training.txt', 'movie-review-combined-test.txt',
+#    'movie-review-combined.NB', 'movie-review-combined-output.txt')
