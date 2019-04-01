@@ -1,2 +1,0 @@
-P(fastcoupleshootfly|comedy) = 7.32421875e-05
-P(fastcoupleshootfly|action) = 0.00017146776406

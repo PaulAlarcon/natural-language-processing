@@ -1,81 +1,69 @@
-# take training / test directory containing movie review.
-# perform pre-processing on each file and output files in the vector format to be used by NB.py
-
-# separate punctuation from words, lowercase words in reviews.
-# BOW = bag of words
 import os
 import re
 
 my_working_dir = os.getcwd()
 
-one_big_training_document = open('movie-review-combined-training.txt', 'w+')
-one_big_test_document = open('movie-review-combined-test.txt', 'w+')
-
+one_big_training_document = open('movie-review-combined-training.txt', 'w+', encoding="utf8")
+one_big_test_document = open('movie-review-combined-test.txt', 'w+', encoding="utf8")
+check_test_document = open('check-test-document.txt', 'w+', encoding="utf8")
 
 def combineTrainingReview(my_working_dir, directory, class_file, label):
     os.chdir(directory)
+
     all_files_inside_dir = os.listdir(".")
     container_review = []
 
     for each_file in all_files_inside_dir:
-        f = open(each_file, 'r+')
-        for sentence in f:
-            review_lower = sentence.lower()
-            list_review_removed_punctuation = re.findall(
-                r"[\w']+|[.,!?;]", review_lower)
+        each_file_open = open(each_file, 'r+', encoding="utf8")
 
-            sentence_after_removed_punctuation = ''
-            for string in list_review_removed_punctuation:
-                sentence_after_removed_punctuation = sentence_after_removed_punctuation + ' ' + string
-            sentence_after_removed_punctuation = sentence_after_removed_punctuation.strip()
+        sentence =  each_file_open.readline()
+        review_lower = sentence.lower()
+        list_review_removed_punctuation = re.findall(r"[\w']+|[.,!?;]", review_lower)
 
-            container_review.append(sentence_after_removed_punctuation)
-        f.close()
+        sentence = " "
+        sentence = sentence.join(list_review_removed_punctuation).strip()
+        container_review.append(sentence)
+
+        each_file_open.close()
 
     os.chdir(my_working_dir)
-    f = open('movie-review-' + class_file + '-training.txt', 'w+')
+    review_training_file = open('movie-review-' + class_file + '-training.txt', 'w+', encoding="utf8")
     for sentence in container_review:
-        f.write(label + ' ' + sentence + ' \n')
-        one_big_training_document.write(label + ' ' + sentence + ' \n')
-    f.close()
+        review_training_file.write(label + sentence + ' \n')
+        one_big_training_document.write(label + sentence + ' \n')
+    review_training_file.close()
 
 
-def combineTestReview(my_working_dir, directory, class_file):
+def combineTestReview(my_working_dir, directory, class_file, label):
     os.chdir(directory)
+
     all_files_inside_dir = os.listdir(".")
     container_review = []
 
     for each_file in all_files_inside_dir:
-        f = open(each_file, 'r+')
-        for sentence in f:
-            review_lower = sentence.lower()
-            list_review_removed_punctuation = re.findall(
-                r"[\w']+|[.,!?;]", review_lower)
+        each_file_open = open(each_file, 'r+', encoding="utf8")
 
-            sentence_after_removed_punctuation = ''
-            for string in list_review_removed_punctuation:
-                sentence_after_removed_punctuation = sentence_after_removed_punctuation + ' ' + string
-            sentence_after_removed_punctuation = sentence_after_removed_punctuation.strip()
+        sentence = each_file_open.readline()
+        review_lower = sentence.lower()
+        list_review_removed_punctuation = re.findall(r"[\w']+|[.,!?;]", review_lower)
 
-            container_review.append(sentence_after_removed_punctuation)
-        f.close()
+        sentence = " "
+        sentence = sentence.join(list_review_removed_punctuation).strip()
+        container_review.append(sentence)
+
+        each_file_open.close()
 
     os.chdir(my_working_dir)
-    f = open('movie-review-' + class_file + '-testing.txt', 'w+')
+    review_test_file = open('movie-review-' + class_file + '-testing.txt', 'w+', encoding="utf8")
     for sentence in container_review:
-        f.write(sentence + ' \n')
+        review_test_file.write(sentence + ' \n')
         one_big_test_document.write(sentence + ' \n')
-    f.close()
+        check_test_document.write(label + ' ' + sentence + ' \n')
+    review_test_file.close()
 
 
-combineTrainingReview(my_working_dir,
-                      'movie-review-HW2/aclImdb/train/pos', 'positive', '+pos+')
+combineTrainingReview(my_working_dir,'movie-review-HW2/aclImdb/train/pos','positive','+,')
+combineTrainingReview(my_working_dir,'movie-review-HW2/aclImdb/train/neg','negative','-,')
 
-combineTrainingReview(my_working_dir,
-                      'movie-review-HW2/aclImdb/train/neg', 'negative', '-neg-')
-
-combineTestReview(
-    my_working_dir, 'movie-review-HW2/aclImdb/test/pos', 'positive')
-
-combineTestReview(
-    my_working_dir, 'movie-review-HW2/aclImdb/test/neg', 'negative')
+combineTestReview(my_working_dir,'movie-review-HW2/aclImdb/test/pos','positive', '+,')
+combineTestReview(my_working_dir,'movie-review-HW2/aclImdb/test/neg','negative', '-,')
